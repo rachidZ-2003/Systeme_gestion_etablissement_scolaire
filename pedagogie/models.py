@@ -1,11 +1,24 @@
-from django.db import models
-
-# Create your models here.
 # pedagogie/models.py
 from django.db import models
-from administration.models import Salle, Classe, Periode, Trimestre
-from scolarite.models import Cours, Coefficient, Devoir
-from utilisateurs.models import AncienEleve, Enseignant
+from scolarite.models import Cours, Classe, Eleve, AncienEleve, Coefficient
+from administration.models import Salle, Classe
+from utilisateurs.models import Enseignant
+
+class Periode(models.Model):
+    annee_scolaire = models.CharField(max_length=20)
+    etablissement = models.ForeignKey('administration.Etablissement', on_delete=models.CASCADE, related_name='periodes')
+
+    def __str__(self):
+        return f"{self.annee_scolaire} - {self.etablissement}"
+
+class Trimestre(models.Model):
+    nom = models.CharField(max_length=50)
+    date_debut = models.DateField()
+    date_fin = models.DateField()
+    periode = models.ForeignKey(Periode, on_delete=models.CASCADE, related_name='trimestres')
+
+    def __str__(self):
+        return f"{self.nom} - {self.periode}"
 
 class EmploiDuTemps(models.Model):
     annee_scolaire = models.CharField(max_length=20)
