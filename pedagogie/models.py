@@ -1,15 +1,8 @@
 # pedagogie/models.py
 from django.db import models
-from scolarite.models import Cours, Classe, Eleve, AncienEleve, Coefficient
-from administration.models import Salle, Classe
-from utilisateurs.models import Enseignant
-
-class Periode(models.Model):
-    annee_scolaire = models.CharField(max_length=20)
-    etablissement = models.ForeignKey('administration.Etablissement', on_delete=models.CASCADE, related_name='periodes')
-
-    def __str__(self):
-        return f"{self.annee_scolaire} - {self.etablissement}"
+from scolarite.models import Cours, Coefficient
+from administration.models import Salle, Classe,Periode
+from utilisateurs.models import Enseignant, Eleve, AncienEleve
 
 class Trimestre(models.Model):
     nom = models.CharField(max_length=50)
@@ -27,36 +20,92 @@ class EmploiDuTemps(models.Model):
     def __str__(self):
         return f"Emploi {self.annee_scolaire} - {self.salle}"
 
-class Seance(models.Model):
-    date = models.DateField()
-    type = models.CharField(max_length=50)
-    status = models.CharField(max_length=50)
-    enseignant = models.ForeignKey(Enseignant, on_delete=models.PROTECT, related_name='seances')
-    cours = models.ForeignKey(Cours, on_delete=models.PROTECT, related_name='seances')
-    salle = models.ForeignKey(Salle, on_delete=models.PROTECT, related_name='seances')
-    devoir = models.ForeignKey('Devoir', on_delete=models.SET_NULL, null=True, blank=True, related_name='seances')
+class Enseignement(models.Model):
+    enseignant = models.ForeignKey(
+        Enseignant, on_delete=models.CASCADE, related_name="enseignements"
+    )
+    cours = models.ForeignKey(
+        Cours, on_delete=models.CASCADE, related_name="enseignements"
+    )
+    salle = models.ForeignKey(
+        Salle, on_delete=models.CASCADE, related_name="enseignements"
+    )
+
+    annee_scolaire = models.CharField(max_length=20)
+    heures_par_semaine = models.PositiveIntegerField(default=0)
+    statut = models.CharField(
+        max_length=20,
+        choices=[('actif', 'Actif'), ('annule', 'Annulé')],
+        default='actif'
+    )
+
+    class Meta:
+        unique_together = ('enseignant', 'cours', 'salle', 'annee_scolaire')
 
     def __str__(self):
-        return f"Seance {self.date} - {self.cours} - {self.salle}"
+        return f"{self.enseignant} enseigne {self.cours.nom} dans {self.salle.nom} ({self.annee_scolaire})"
+
+class Seance(models.Model):
+    enseignement = models.ForeignKey(
+        Enseignement, on_delete=models.CASCADE, related_name="seances",default=1
+    )
+    date = models.DateField()
+    type = models.CharField(max_length=50)   # ex: "Cours", "TD", "TP"
+    status = models.CharField(max_length=50) # ex: "Planifiée", "Effectuée"
+    heure_debut = models.TimeField(null=True, blank=True)
+    duree = models.PositiveIntegerField(default=60)  # durée en minutes
+
+    class Meta:
+        unique_together = ('enseignement', 'date', 'heure_debut')
+
+    def __str__(self):
+        return f"Seance {self.date} - {self.enseignement}"
 
 class Creneau(models.Model):
-    jours = models.CharField(max_length=20)
+    """
+    Un créneau correspond à un intervalle horaire dans l'emploi du temps.
+    Un créneau peut planifier une seule séance, peut avoir 0 ou 1 devoir, et plusieurs absences.
+    """
+    jours = models.CharField(max_length=20)       # ex: "Lundi"
     heure_debut = models.TimeField()
     heure_fin = models.TimeField()
+
     emploi_du_temps = models.ForeignKey(EmploiDuTemps, on_delete=models.CASCADE, related_name='creneaux')
     seance = models.ForeignKey(Seance, on_delete=models.SET_NULL, null=True, blank=True, related_name='creneaux')
+
+    # 0 ou 1 devoir par créneau
+    devoir = models.ForeignKey('Devoir', on_delete=models.SET_NULL, null=True, blank=True, related_name='creneaux')
 
     def __str__(self):
         return f"{self.jours} {self.heure_debut}-{self.heure_fin} @ {self.emploi_du_temps}"
 
+
+class Absence(models.Model):
+    """
+    Une absence concerne un Ancien Élève pour un créneau précis.
+    """
+    motif = models.CharField(max_length=200)
+    justifier = models.BooleanField(default=False)
+
+    # Absence - Créneau : (* : 1)
+    creneau = models.ForeignKey(Creneau, on_delete=models.CASCADE, related_name='absences')
+    ancien_eleve = models.ForeignKey(AncienEleve, on_delete=models.CASCADE, related_name='absences')
+
+    def __str__(self):
+        return f"Absence {self.ancien_eleve} @ {self.creneau}"
+
 class Devoir(models.Model):
+    """
+    Un devoir est lié à un cours et peut être attribué à un créneau.
+    """
     titre = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    date_publication = models.DateField()
-    date_devoir = models.DateField()
-    type = models.CharField(max_length=50)
+    date_publication = models.DateField()  # date d'annonce
+    date_devoir = models.DateField()       # date d'exécution / échéance
+    type = models.CharField(max_length=50) # "Exercice", "Contrôle", "DM", ...
     note_max = models.FloatField(default=20)
-    cours = models.ForeignKey(Cours, on_delete=models.CASCADE, related_name='devoirs')
+
+    
     eleves = models.ManyToManyField(AncienEleve, through='Note', related_name='devoirs')
 
     def __str__(self):

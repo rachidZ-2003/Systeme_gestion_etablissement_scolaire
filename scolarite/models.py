@@ -3,9 +3,9 @@ from django.db import models
 # Create your models here.
 # scolarite/models.py
 from django.db import models
-from administration.models import Classe, Etablissement, Periode
+from administration.models import Classe, Etablissement, Periode # Ensure Periode is imported from administration
 from utilisateurs.models import Eleve
-from pedagogie.models import AncienEleve  # si besoin pour FK Note plus tard
+from utilisateurs.models import AncienEleve # Corrected import for AncienEleve
 
 class Cours(models.Model):
     libelle = models.CharField(max_length=100)
@@ -40,7 +40,7 @@ class Demande(models.Model):
         return f"Demande {self.eleve} -> {self.etablissement} ({self.statut})"
 
 class Inscription(models.Model):
-    ancien_eleve = models.ForeignKey(Eleve, on_delete=models.CASCADE, related_name="inscriptions")
+    ancien_eleve = models.ForeignKey(AncienEleve, on_delete=models.CASCADE, related_name="inscriptions") # Changed to AncienEleve
     periode = models.ForeignKey(Periode, on_delete=models.CASCADE, related_name="inscriptions")
     date_inscription = models.DateField(auto_now_add=True)
     statut = models.CharField(
@@ -48,6 +48,7 @@ class Inscription(models.Model):
         choices=[('en_attente', 'En attente'), ('validee', 'Validée'), ('refusee', 'Refusée')],
         default='en_attente'
     )
+    photo = models.ImageField(upload_to='inscriptions_photos/', null=True, blank=True)
 
     def __str__(self):
         return f"Inscription de {self.ancien_eleve} pour {self.periode}"

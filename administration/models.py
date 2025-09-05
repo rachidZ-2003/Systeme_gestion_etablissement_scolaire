@@ -1,8 +1,6 @@
 from django.db import models
 
-# Create your models here.
-# administration/models.py
-from django.db import models
+
 from utilisateurs.models import Utilisateur, ChefEtablissement, Caissier, Censeur, Enseignant
 
 class Etablissement(models.Model):
