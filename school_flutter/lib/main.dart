@@ -173,7 +173,7 @@ class SchoolManagementApp extends StatelessWidget {
       title: 'Plateforme de Gestion Scolaire',
       debugShowCheckedModeBanner: false,
       
-     //  home: AdministrateurDashboard(),
+  
     home:PublicHomeScreen()
 
     );
