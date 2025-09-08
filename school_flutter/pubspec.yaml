@@ -20,6 +20,10 @@ dependencies:
   lottie: ^3.1.2
   google_fonts: ^6.2.1
   flutter_animate: ^4.5.0
+  # Package pour les graphiques
+  fl_chart: ^0.66.2
+  # Package pour Google Maps
+  google_maps_flutter: ^2.5.3
   
 
 dev_dependencies:

@@ -146,8 +146,8 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.green.shade700,
-            Colors.green.shade500,
+            const Color.fromARGB(255, 56, 142, 75),
+            const Color.fromARGB(255, 96, 175, 76),
             const Color.fromARGB(255, 241, 255, 38),
           ],
         ),

@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:school_flutter/administration/chef_etablissement/importation.dart';
+import 'package:school_flutter/administration/chef_etablissement/notification.dart';
+import 'package:school_flutter/administration/chef_etablissement/parametrage.dart';
+import 'package:school_flutter/administration/chef_etablissement/pedagogie.dart';
+import 'package:school_flutter/administration/chef_etablissement/statistiques.dart';
+import 'package:school_flutter/administration/chef_etablissement/utilisateur.dart';
+import 'package:school_flutter/administration/chef_etablissement/ecole.dart';
 
 void main() {
   runApp(const MyApp());
@@ -215,7 +222,7 @@ class _ChefEtablissementDashboardState extends State<ChefEtablissementDashboard>
   int _selectedIndex = 0;
 
   final List<String> _titles = [
-    "Panneaux d’accueil",
+    "Accueil",
     "Paramétrages",
     "Utilisateur",
     "École",
@@ -234,45 +241,71 @@ class _ChefEtablissementDashboardState extends State<ChefEtablissementDashboard>
     Icons.menu_book,
     Icons.assignment,
     Icons.how_to_reg,
-    Icons.account_balance,
     Icons.notifications,
     Icons.file_upload,
   ];
 
   // Méthode pour naviguer vers la page correspondante
-  //void _navigateToPage(int index) {
-  //  Navigator.push(
-   //   context,
-   //   MaterialPageRoute(builder: (context) => _buildPage(index)),
-   // );
-  //}
+  void _navigateToPage(int index) {
+    if (index == 0) { // Si c'est la page d'accueil
+      setState(() {
+        _selectedIndex = 0;
+      });
+      return; // Reste sur la page d'accueil
+    }
+
+    Widget page = _buildPage(index);
+    if (page is! Container) { // Si ce n'est pas la page par défaut
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => page,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(1.0, 0.0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOutCubic;
+            
+            var tween = Tween(begin: begin, end: end).chain(
+              CurveTween(curve: curve),
+            );
+            
+            return SlideTransition(
+              position: animation.drive(tween),
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_titles[index]} - En cours de développement'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 
   // Construction de la page en fonction de l'index
-  //Widget _buildPage(int index) {
-   // switch (index) {
-     // case 0:
-     //   return AccueilPage();
-    //  case 1:
-    //    return GestionElevesPage();
-    //  case 2:
-    //    return GestionEnseignantsPage();
-     // case 3:
-    //    return StatistiquesPage();
-    //  case 4:
-    //    return ParametresPage();
-     // case 5:
-     //   return GestionEnseignantsPage();
-    //  case 6:
-     //   return StatistiquesPage();
-     // case 7:
-     //   return ParametresPage();
-     // case 8:
-      //  return GestionEnseignantsPage();
-     // case 9:
-      //default:
-       // return Container();
-   // }
-  //}
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 1: // Paramétrages
+        return const ParametragesPage();
+      case 2: // Utilisateur
+        return const UtilisateurPage();
+      case 3: // École
+        return const EcolePage();
+      case 4: // Pédagogie
+        return const PedagogiePage();
+      case 7: // Notification
+        return const NotificationPage();
+      case 8: // Importation
+        return const ImportationPage();
+      default:
+        return Container();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -328,7 +361,8 @@ class _ChefEtablissementDashboardState extends State<ChefEtablissementDashboard>
                   setState(() {
                     _selectedIndex = i;
                   });
-                  Navigator.pop(context);
+                  Navigator.pop(context); // Ferme le drawer
+                  _navigateToPage(i); // Navigate vers la page sélectionnée
                 },
               ),
           ],
