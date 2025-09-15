@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:school_flutter/administration/parent/parent_subscription_screen.dart';
 import 'package:school_flutter/administration/chef_etablissement/chef_subscription_screen.dart';
 import 'package:school_flutter/administration/eleve/student_subscription_screen.dart';
 import 'package:school_flutter/administration/eleve/student_workspace_screen.dart';
-import 'package:school_flutter/administration/parent/parent_bashbord.dart';
 import 'package:school_flutter/administration/chef_etablissement/template_chef.dart';
+import 'package:school_flutter/administration/parent/parent_registration_screen.dart';
+import 'package:school_flutter/administration/parent/dasboard_basique_parent.dart';
+
 class PublicHomeScreen extends StatefulWidget {
   const PublicHomeScreen({super.key});
 
@@ -35,12 +36,12 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
           Container(
             padding: EdgeInsets.all(isSmallScreen ? 6 : 8),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
+              color: const Color.fromARGB(255, 76, 175, 170).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               Icons.school,
-              color: Colors.green.shade600,
+              color: const Color.fromARGB(255, 67, 146, 160),
               size: isSmallScreen ? 20 : 24,
             ),
           ),
@@ -60,9 +61,9 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.green.shade700,
-              Colors.green.shade500,
-              const Color.fromARGB(255, 208, 255, 38),
+              const Color.fromARGB(255, 56, 103, 142),
+              const Color.fromARGB(255, 76, 122, 175),
+              const Color.fromARGB(255, 38, 107, 255),
             ],
           ),
         ),
@@ -81,8 +82,8 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color.fromARGB(255, 193, 255, 77).withOpacity(0.9),
-                  const Color.fromARGB(255, 161, 255, 38).withOpacity(0.9),
+                  const Color.fromARGB(255, 77, 148, 255).withOpacity(0.9),
+                  const Color.fromARGB(255, 38, 139, 255).withOpacity(0.9),
                 ],
               ),
               borderRadius: BorderRadius.circular(20),
@@ -146,9 +147,9 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            const Color.fromARGB(255, 56, 142, 75),
-            const Color.fromARGB(255, 96, 175, 76),
-            const Color.fromARGB(255, 241, 255, 38),
+            const Color.fromARGB(255, 56, 122, 142),
+            const Color.fromARGB(255, 76, 152, 175),
+            const Color.fromARGB(255, 38, 157, 255),
           ],
         ),
       ),
@@ -167,29 +168,44 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
                     title: 'Accueil',
                     onTap: () => Navigator.pop(context),
                   ),
-                  _buildExpandableDrawerItem(
+                  const SizedBox(height: 10),
+                   _buildDrawerItem(
+                    icon: Icons.admin_panel_settings_rounded,
+                    title: 'Parent',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                     MaterialPageRoute(
+                      builder: (context) => const ParentLoginScreen(),
+      ),
+    );
+                    },
+                  ),
+                  const SizedBox(height: 10),
+               /*   _buildExpandableDrawerItem(
                     icon: Icons.people_rounded,
                     title: 'Parents',
                     children: [
                       _buildSubDrawerItem(
-                        title: 'Souscription',
+                        title: 'Creation de compte',
                         onTap: () {
                           Navigator.pop(context);
                           _navigateToParentSubscription();
                         },
                       ),
                       _buildSubDrawerItem(
-                        title: 'Espace de travail',
+                        title: 'Connexion',
                         onTap: () {
                           Navigator.pop(context);
                           _navigateToParentWorkspace();
                         },
                       ),
                     ],
-                  ),
+                  ),*/
                   _buildDrawerItem(
-                    icon: Icons.admin_panel_settings,
-                    title: 'Connexion chef',
+                    icon: Icons.person_rounded,
+                    title: 'Chef',
                     onTap: () {
                       Navigator.pop(context);
                        Navigator.push(
@@ -200,7 +216,21 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
     );
                     },
                   ),
-                  _buildExpandableDrawerItem(
+                  const SizedBox(height: 10),
+                  _buildDrawerItem(
+                    icon: Icons.supervisor_account,
+                    title: 'Élève',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                     MaterialPageRoute(
+                      builder: (context) => const StudentLoginScreen(),
+      ),
+    );
+                    },
+                  ),
+                /*  _buildExpandableDrawerItem(
                     icon: Icons.child_care_rounded,
                     title: 'Élève',
                     children: [
@@ -212,14 +242,15 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
                         },
                       ),
                       _buildSubDrawerItem(
-                        title: 'Espace de travail',
+                        title: 'se connecter ou Creer un compte',
                         onTap: () {
                           Navigator.pop(context);
                           _navigateToStudentWorkspace();
                         },
                       ),
                     ],
-                  ),
+                  ),*/
+                  const SizedBox(height: 10),
                   _buildDrawerItem(
                     icon: Icons.new_releases_rounded,
                     title: 'Actualités',
@@ -274,8 +305,8 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color.fromARGB(255, 49, 125, 46),
-            const Color.fromARGB(255, 67, 160, 67),
+            const Color.fromARGB(255, 46, 64, 125),
+            const Color.fromARGB(255, 67, 141, 160),
           ],
         ),
       ),
@@ -297,7 +328,7 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
             ),
             child: Icon(
               Icons.school,
-              color: Colors.green.shade600,
+              color: const Color.fromARGB(255, 67, 160, 147),
               size: isSmallScreen ? 24 : 30,
             ),
           ),
@@ -444,7 +475,7 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
             style: TextStyle(
               fontSize: isSmallScreen ? 24 : (isMediumScreen ? 28 : 32),
               fontWeight: FontWeight.bold,
-              color: Colors.green.shade800,
+              color: const Color.fromARGB(255, 46, 109, 125),
             ),
             textAlign: TextAlign.center,
           ),
@@ -453,7 +484,7 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
             'La plateforme complète de gestion des établissements scolaires',
             style: TextStyle(
               fontSize: isSmallScreen ? 14 : (isMediumScreen ? 16 : 18),
-              color: Colors.green.shade600,
+              color: const Color.fromARGB(255, 67, 126, 160),
             ),
             textAlign: TextAlign.center,
           ),
@@ -461,10 +492,10 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
           Container(
             height: isSmallScreen ? 220 : 300,
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
+              color: const Color.fromARGB(255, 76, 175, 167).withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.green.withOpacity(0.2),
+                color: const Color.fromARGB(255, 76, 160, 175).withOpacity(0.2),
                 width: 2,
               ),
             ),
@@ -475,7 +506,7 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
                   Icon(
                     Icons.school,
                     size: isSmallScreen ? 60 : 80,
-                    color: Colors.green.shade400,
+                    color: const Color.fromARGB(255, 102, 187, 187),
                   ),
                   SizedBox(height: isSmallScreen ? 12 : 16),
                   Text(
@@ -483,7 +514,7 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
                     style: TextStyle(
                       fontSize: isSmallScreen ? 16 : (isMediumScreen ? 18 : 20),
                       fontWeight: FontWeight.w600,
-                      color: Colors.green.shade700,
+                      color: const Color.fromARGB(255, 56, 142, 142),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -574,7 +605,7 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
             style: TextStyle(
               fontSize: isSmallScreen ? 22 : (isMediumScreen ? 25 : 28),
               fontWeight: FontWeight.bold,
-              color: Colors.green.shade800,
+              color: const Color.fromARGB(255, 46, 125, 118),
             ),
           ),
           SizedBox(height: isSmallScreen ? 20 : 32),
@@ -700,8 +731,8 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color.fromARGB(255, 46, 125, 59),
-            const Color.fromARGB(255, 66, 142, 56),
+            const Color.fromARGB(255, 46, 54, 125),
+            const Color.fromARGB(255, 56, 57, 142),
           ],
         ),
       ),
@@ -819,7 +850,7 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
   void _navigateToParentSubscription() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ParentSubscriptionScreen()),
+      MaterialPageRoute(builder: (context) => const ParentRegistrationScreen()),
     );
   }
 

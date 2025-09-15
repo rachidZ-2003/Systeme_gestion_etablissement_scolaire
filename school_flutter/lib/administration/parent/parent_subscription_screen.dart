@@ -135,7 +135,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
    void _navigateToParentWorkspace() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ParentLoginScreen()),
+      MaterialPageRoute(builder: (context) => const parentEspaceLogin()),
     );
   }
 
@@ -218,7 +218,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Souscription Parent'),
-        backgroundColor: Colors.green.shade700,
+        backgroundColor: const Color.fromARGB(255, 56, 118, 142),
         foregroundColor: Colors.white,
         actions: [
           if (_isMatriculeValid)
@@ -256,13 +256,13 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                             Icon(
                               Icons.family_restroom,
                               size: 48,
-                              color: Colors.green.shade700,
+                              color: const Color.fromARGB(255, 56, 125, 142),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Création de compte parent',
                               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: Colors.green.shade700,
+                                color: const Color.fromARGB(255, 56, 110, 142),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -297,7 +297,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                                 ),
                               )
                             : _isMatriculeValid
-                                ? Icon(Icons.check_circle, color: Colors.green.shade600)
+                                ? Icon(Icons.check_circle, color: const Color.fromARGB(255, 67, 115, 160))
                                 : null,
                         helperText: 'Ex: MAT123, MAT456',
                       ),
@@ -335,7 +335,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                       label: Text(_isVerifyingMatricule ? 'Vérification...' : 'Vérifier Matricule'),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        backgroundColor: Colors.green.shade600,
+                        backgroundColor: const Color.fromARGB(255, 67, 141, 160),
                         foregroundColor: Colors.white,
                       ),
                     ),
@@ -355,13 +355,13 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.person, color: Colors.green.shade700),
+                                  Icon(Icons.person, color: const Color.fromARGB(255, 56, 132, 142)),
                                   const SizedBox(width: 8),
                                   Text(
                                     'Informations de l\'élève',
                                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.green.shade700,
+                                      color: const Color.fromARGB(255, 56, 100, 142),
                                     ),
                                   ),
                                 ],
@@ -458,10 +458,10 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                                 ),
                               )
                             : const Icon(Icons.account_circle),
-                        label: Text(_isLoading ? 'Création en cours...' : 'Créer le Compte'),
+                        label: Text(_isLoading ? 'Souscription en cours...' : 'Souscrire'),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Colors.orange.shade600,
+                          backgroundColor: const Color.fromARGB(255, 0, 251, 230),
                           foregroundColor: Colors.white,
                           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
@@ -475,18 +475,18 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                         decoration: BoxDecoration(
                           color: Colors.blue.shade50,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color.fromARGB(255, 144, 249, 144)),
+                          border: Border.all(color: const Color.fromARGB(255, 144, 216, 249)),
                           
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.info, color: const Color.fromARGB(255, 30, 229, 106), size: 20),
+                            Icon(Icons.info, color: const Color.fromARGB(255, 30, 173, 229), size: 20),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'Vos informations sont sécurisées et ne seront utilisées que pour la gestion du suivi scolaire.',
                                 style: TextStyle(
-                                  color: const Color.fromARGB(255, 25, 210, 40),
+                                  color: const Color.fromARGB(255, 25, 210, 201),
                                   fontSize: 12,
                                 ),
                               ),

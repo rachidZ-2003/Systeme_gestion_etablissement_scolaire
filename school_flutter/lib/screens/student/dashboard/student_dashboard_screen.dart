@@ -59,9 +59,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.green.shade700,
-              Colors.green.shade500,
-              Colors.green.shade300,
+              const Color.fromARGB(255, 56, 100, 142),
+              const Color.fromARGB(255, 76, 168, 175),
+              const Color.fromARGB(255, 129, 167, 199),
             ],
           ),
         ),
@@ -70,7 +70,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
           children: [
             UserAccountsDrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.green.shade900,
+                color: const Color.fromARGB(255, 27, 90, 94),
               ),
               accountName: const Text('John Doe'),
               accountEmail: const Text('Classe: 3ème A'),
@@ -80,7 +80,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   'JD',
                   style: TextStyle(
                     fontSize: 24,
-                    color: Colors.green.shade700,
+                    color: const Color.fromARGB(255, 56, 122, 142),
                   ),
                 ),
               ),
@@ -241,12 +241,12 @@ class _StudentDashboardState extends State<StudentDashboard> {
           width: 120,
           child: Column(
             children: [
-              Icon(icon, color: Colors.green.shade700),
+              Icon(icon, color: const Color.fromARGB(255, 56, 129, 142)),
               const SizedBox(height: 8),
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.green.shade700),
+                style: TextStyle(color: const Color.fromARGB(255, 56, 103, 142)),
               ),
             ],
           ),
