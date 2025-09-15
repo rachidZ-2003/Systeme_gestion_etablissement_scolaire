@@ -51,9 +51,45 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
     }
   }
 
+  // Fonction pour gérer le retour
+  void _goBack() {
+    // Vous pouvez personnaliser cette fonction selon vos besoins
+    Navigator.of(context).pop();
+    // Ou naviguer vers une page d'accueil spécifique :
+    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Ajout de l'AppBar avec bouton de retour
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.arrow_back,
+              color: Color(0xFF2D3748),
+              size: 20,
+            ),
+          ),
+          onPressed: _goBack,
+        ),
+      ),
+      extendBodyBehindAppBar: true,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -96,7 +132,7 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                       TextField(
                         controller: _emailController,
                         decoration: InputDecoration(
-                          hintText: "Identifiant",
+                          hintText: "Identifiant (parent)",
                           hintStyle: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 16,
@@ -135,7 +171,7 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          hintText: "Mot de passe",
+                          hintText: "Mot de passe (1234)",
                           hintStyle: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 16,
@@ -177,7 +213,7 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color.fromARGB(255, 107, 255, 164),
                             foregroundColor: Colors.white,
-                            elevation: 0,
+                            elevation: 2,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -189,6 +225,49 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // Bouton de retour alternatif
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TextButton(
+                          onPressed: _goBack,
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.grey[700],
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.arrow_back,
+                                size: 20,
+                                color: Colors.grey[700],
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Retour à l'accueil",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[700],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),

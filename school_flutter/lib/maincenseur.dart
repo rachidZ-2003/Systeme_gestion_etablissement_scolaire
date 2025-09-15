@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'administration/Administrateur/admin_bashboard.dart';
+import 'administration/censeur/censeur_login_screen.dart';
+
 
 
 void main() {
@@ -15,7 +16,8 @@ class SchoolManagementApp extends StatelessWidget {
       title: 'Plateforme de Gestion Scolaire',
       debugShowCheckedModeBanner: false,
       
-      home: AdministrateurDashboard(),
+    
+      home: CenseurLoginScreen(),
     
 
     );
