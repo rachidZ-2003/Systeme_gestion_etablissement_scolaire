@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:school_flutter/administration/chef_etablissement/controllers/notification_controller.dart';
+import 'package:school_flutter/administration/chef_etablissement/models/notification_model.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});

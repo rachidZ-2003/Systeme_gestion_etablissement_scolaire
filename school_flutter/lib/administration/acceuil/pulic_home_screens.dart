@@ -3,8 +3,8 @@ import 'package:school_flutter/administration/parent/parent_subscription_screen.
 import 'package:school_flutter/administration/chef_etablissement/chef_subscription_screen.dart';
 import 'package:school_flutter/administration/eleve/student_subscription_screen.dart';
 import 'package:school_flutter/administration/eleve/student_workspace_screen.dart';
-import 'package:school_flutter/administration/chef_etablissement/chef_etablissement_bashboard.dart';
 import 'package:school_flutter/administration/parent/parent_bashbord.dart';
+import 'package:school_flutter/administration/chef_etablissement/template_chef.dart';
 class PublicHomeScreen extends StatefulWidget {
   const PublicHomeScreen({super.key});
 
@@ -187,25 +187,18 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
                       ),
                     ],
                   ),
-                  _buildExpandableDrawerItem(
-                    icon: Icons.business_rounded,
-                    title: 'Chef Établissement',
-                    children: [
-                      _buildSubDrawerItem(
-                        title: 'Souscription',
-                        onTap: () {
-                          Navigator.pop(context);
-                          _showCodeEtablissementDialog();
-                        },
-                      ),
-                      _buildSubDrawerItem(
-                        title: 'Espace de travail',
-                        onTap: () {
-                          Navigator.pop(context);
-                          _navigateTochefEtablissementSubscription();
-                        },
-                      ),
-                    ],
+                  _buildDrawerItem(
+                    icon: Icons.admin_panel_settings,
+                    title: 'Connexion chef',
+                    onTap: () {
+                      Navigator.pop(context);
+                       Navigator.push(
+                        context,
+                     MaterialPageRoute(
+                      builder: (context) => const TemplateChefLogin(),
+      ),
+    );
+                    },
                   ),
                   _buildExpandableDrawerItem(
                     icon: Icons.child_care_rounded,
@@ -232,38 +225,15 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
                     title: 'Actualités',
                     onTap: () {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Actualités - En développement')),
-                      );
+                      Navigator.push(
+                        context,
+                     MaterialPageRoute(
+                      builder: (context) => const PublicHomeScreen(),
+      ),
+    );
                     },
                   ),
-                  _buildExpandableDrawerItem(
-                    icon: Icons.login_rounded,
-                    title: 'Connexion',
-                    children: [
-                      _buildSubDrawerItem(
-                        title: 'Premier cycle',
-                        onTap: () {
-                          Navigator.pop(context);
-                          _navigateToStudentWorkspace();
-                        },
-                      ),
-                      _buildSubDrawerItem(
-                        title: 'Second cycle',
-                        onTap: () {
-                          Navigator.pop(context);
-                          _navigateToStudentWorkspace();
-                        },
-                      ),
-                      _buildSubDrawerItem(
-                        title: 'Parent',
-                        onTap: () {
-                          Navigator.pop(context);
-                          _navigateToParentWorkspace();
-                        },
-                      ),
-                    ],
-                  ),
+                
                 ],
               ),
             ),
@@ -870,12 +840,7 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
       MaterialPageRoute(builder: (context) => const StudentSubscriptionScreen()),
     );
   }
-void _navigateTochefEtablissementSubscription() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ChefLogin()),
-    );
-  }
+
 
 
 

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:school_flutter/administration/chef_etablissement/importation.dart';
 import 'package:school_flutter/administration/chef_etablissement/notification.dart';
-import 'package:school_flutter/administration/chef_etablissement/parametrage.dart';
 import 'package:school_flutter/administration/chef_etablissement/pedagogie.dart';
-import 'package:school_flutter/administration/chef_etablissement/statistiques.dart';
 import 'package:school_flutter/administration/chef_etablissement/utilisateur.dart';
 import 'package:school_flutter/administration/chef_etablissement/ecole.dart';
+import 'package:school_flutter/administration/chef_etablissement/pages/batiment_page.dart';
+import 'package:school_flutter/administration/chef_etablissement/pages/salle_page.dart';
+import 'package:school_flutter/administration/chef_etablissement/pages/classe_page.dart';
+import 'package:school_flutter/administration/chef_etablissement/pages/matiere_page.dart';
+import 'package:school_flutter/administration/chef_etablissement/pages/periode_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +23,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "SchoolMap",
       theme: ThemeData(primarySwatch: Colors.green),
-      home: const ChefLogin (),
+      home: const ChefLogin(),
     );
   }
 }
@@ -54,9 +57,42 @@ class _ChefLoginState extends State<ChefLogin> {
     }
   }
 
+  // Fonction pour gérer le retour
+  void _goBack() {
+    Navigator.of(context).pop();
+    // Alternative : Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.arrow_back,
+              color: Color(0xFF2D3748),
+              size: 20,
+            ),
+          ),
+          onPressed: _goBack,
+        ),
+      ),
+      extendBodyBehindAppBar: true,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -86,12 +122,13 @@ class _ChefLoginState extends State<ChefLogin> {
                     children: [
                       // Titre
                       const Text(
-                        "Connexion - chef d'etablissement",
+                        "Connexion - Chef d'établissement",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF2D3748),
                         ),
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 32),
                       
@@ -99,7 +136,7 @@ class _ChefLoginState extends State<ChefLogin> {
                       TextField(
                         controller: _ineController,
                         decoration: InputDecoration(
-                          hintText: "Identifiant",
+                          hintText: "Identifiant (INE123)",
                           hintStyle: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 16,
@@ -138,7 +175,7 @@ class _ChefLoginState extends State<ChefLogin> {
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          hintText: "Mot de passe",
+                          hintText: "Mot de passe (1234)",
                           hintStyle: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 16,
@@ -180,7 +217,7 @@ class _ChefLoginState extends State<ChefLogin> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color.fromARGB(255, 107, 255, 144),
                             foregroundColor: Colors.white,
-                            elevation: 0,
+                            elevation: 2,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -192,6 +229,49 @@ class _ChefLoginState extends State<ChefLogin> {
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // Bouton de retour principal
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.green.shade300,
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TextButton(
+                          onPressed: _goBack,
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.green.shade700,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.arrow_back,
+                                size: 20,
+                                color: Colors.green.shade700,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Retour à l'accueil",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.green.shade700,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -218,57 +298,73 @@ class ChefEtablissementDashboard extends StatefulWidget {
       _ChefEtablissementDashboardState();
 }
 
+// Énumération pour les différentes pages
+enum PageType {
+  accueil,
+  utilisateur,
+  batiments,
+  salles,
+  periodes,
+  classes,
+  matieres,
+  gestionNotes,
+  inscription,
+  notification,
+  importation
+}
+
 class _ChefEtablissementDashboardState extends State<ChefEtablissementDashboard> {
-  int _selectedIndex = 0;
+  PageType _currentPage = PageType.accueil;
 
-  final List<String> _titles = [
-    "Accueil",
-    "Paramétrages",
-    "Utilisateur",
-    "École",
-    "Pédagogie",
-    "Gestion des Notes",
-    "Inscription",
-    "Notification",
-    "Importation"
-  ];
-
-  final List<IconData> _icons = [
-    Icons.home,
-    Icons.settings,
-    Icons.person,
-    Icons.school,
-    Icons.menu_book,
-    Icons.assignment,
-    Icons.how_to_reg,
-    Icons.notifications,
-    Icons.file_upload,
-  ];
+  String _getTitle(PageType page) {
+    switch (page) {
+      case PageType.accueil:
+        return "Accueil";
+      case PageType.utilisateur:
+        return "Utilisateur";
+      case PageType.batiments:
+        return "Bâtiments";
+      case PageType.salles:
+        return "Salles";
+      case PageType.periodes:
+        return "Périodes";
+      case PageType.classes:
+        return "Classes";
+      case PageType.matieres:
+        return "Matières";
+      case PageType.gestionNotes:
+        return "Gestion des Notes";
+      case PageType.inscription:
+        return "Inscription";
+      case PageType.notification:
+        return "Notification";
+      case PageType.importation:
+        return "Importation";
+    }
+  }
 
   // Méthode pour naviguer vers la page correspondante
-  void _navigateToPage(int index) {
-    if (index == 0) { // Si c'est la page d'accueil
+  void _navigateToPage(PageType page) {
+    if (page == PageType.accueil) {
       setState(() {
-        _selectedIndex = 0;
+        _currentPage = page;
       });
-      return; // Reste sur la page d'accueil
+      return;
     }
 
-    Widget page = _buildPage(index);
-    if (page is! Container) { // Si ce n'est pas la page par défaut
+    Widget pageWidget = _buildPage(page);
+    if (pageWidget is! Container) {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => page,
+          pageBuilder: (context, animation, secondaryAnimation) => pageWidget,
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             const begin = Offset(1.0, 0.0);
             const end = Offset.zero;
             const curve = Curves.easeInOutCubic;
-            
             var tween = Tween(begin: begin, end: end).chain(
               CurveTween(curve: curve),
             );
-            
             return SlideTransition(
               position: animation.drive(tween),
               child: child,
@@ -280,27 +376,31 @@ class _ChefEtablissementDashboardState extends State<ChefEtablissementDashboard>
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${_titles[index]} - En cours de développement'),
+          content: Text('${_getTitle(page)} - En cours de développement'),
           duration: const Duration(seconds: 2),
         ),
       );
     }
   }
 
-  // Construction de la page en fonction de l'index
-  Widget _buildPage(int index) {
-    switch (index) {
-      case 1: // Paramétrages
-        return const ParametragesPage();
-      case 2: // Utilisateur
+  // Construction de la page en fonction du type
+  Widget _buildPage(PageType page) {
+    switch (page) {
+      case PageType.utilisateur:
         return const UtilisateurPage();
-      case 3: // École
-        return const EcolePage();
-      case 4: // Pédagogie
-        return const PedagogiePage();
-      case 7: // Notification
+      case PageType.batiments:
+        return const BatimentPage();
+      case PageType.salles:
+        return const SallePage();
+      case PageType.periodes:
+        return const PeriodePage();
+      case PageType.classes:
+        return const ClassePage();
+      case PageType.matieres:
+        return const MatierePage();
+      case PageType.notification:
         return const NotificationPage();
-      case 8: // Importation
+      case PageType.importation:
         return const ImportationPage();
       default:
         return Container();
@@ -312,7 +412,7 @@ class _ChefEtablissementDashboardState extends State<ChefEtablissementDashboard>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green.shade800,
-        title: Text("ShoolMap - ${_titles[_selectedIndex]}"),
+        title: Text("SchoolMap - ${_getTitle(_currentPage)}"),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -320,14 +420,15 @@ class _ChefEtablissementDashboardState extends State<ChefEtablissementDashboard>
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const ChefLogin ()),
+                MaterialPageRoute(builder: (context) => const ChefLogin()),
               );
             },
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: CircleAvatar(
-              //backgroundImage: AssetImage("assets/profile.png"), // image fictive
+              backgroundColor: Colors.white24,
+              child: Icon(Icons.person, color: Colors.white),
             ),
           )
         ],
@@ -336,41 +437,154 @@ class _ChefEtablissementDashboardState extends State<ChefEtablissementDashboard>
         child: ListView(
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.green.shade800),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.green.shade800,
+                    Colors.green.shade600,
+                  ],
+                ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  CircleAvatar(
+                children: [
+                  const CircleAvatar(
                     radius: 30,
-                  //  backgroundImage: AssetImage("assets/logo.png"), // logo fictif
+                    backgroundColor: Colors.white24,
+                    child: Icon(Icons.school, size: 35, color: Colors.white),
                   ),
-                  SizedBox(height: 10),
-                  Text("SchoolMap",
-                      style: TextStyle(color: Colors.white, fontSize: 18)),
-                  Text("Chef d'établissement",
-                      style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "SchoolMap",
+                    style: TextStyle(
+                      color: Colors.white, 
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                  const Text(
+                    "Chef d'établissement",
+                    style: TextStyle(
+                      color: Colors.white70, 
+                      fontSize: 14
+                    ),
+                  ),
                 ],
               ),
             ),
-            for (int i = 0; i < _titles.length; i++)
-              ListTile(
-                leading: Icon(_icons[i]),
-                title: Text(_titles[i]),
-                selected: i == _selectedIndex,
-                onTap: () {
-                  setState(() {
-                    _selectedIndex = i;
-                  });
-                  Navigator.pop(context); // Ferme le drawer
-                  _navigateToPage(i); // Navigate vers la page sélectionnée
-                },
+            // Menu Accueil
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("Accueil"),
+              selected: _currentPage == PageType.accueil,
+              onTap: () => _navigateToPage(PageType.accueil),
+            ),
+
+            // Menu Utilisateur
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text("Utilisateur"),
+              selected: _currentPage == PageType.utilisateur,
+              onTap: () => _navigateToPage(PageType.utilisateur),
+            ),
+            // Menu École avec sous-menus
+            Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                leading: const Icon(Icons.school),
+                title: const Text("École"),
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.business, size: 20),
+                    title: const Text("Bâtiments"),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToPage(PageType.batiments);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.meeting_room, size: 20),
+                    title: const Text("Salles"),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToPage(PageType.salles);
+                    },
+                  ),
+                ],
               ),
+            ),
+            // Menu Pédagogie avec sous-menus
+            Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                leading: const Icon(Icons.menu_book),
+                title: const Text("Pédagogie"),
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.schedule, size: 20),
+                    title: const Text("Périodes"),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToPage(PageType.periodes);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.class_, size: 20),
+                    title: const Text("Classes"),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToPage(PageType.classes);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.subject, size: 20),
+                    title: const Text("Matières"),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToPage(PageType.matieres);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            // Autres menus
+            ListTile(
+              leading: const Icon(Icons.assignment),
+              title: const Text("Gestion des Notes"),
+              selected: _currentPage == PageType.gestionNotes,
+              onTap: () => _navigateToPage(PageType.gestionNotes),
+            ),
+            ListTile(
+              leading: const Icon(Icons.how_to_reg),
+              title: const Text("Inscription"),
+              selected: _currentPage == PageType.inscription,
+              onTap: () => _navigateToPage(PageType.inscription),
+            ),
+            ListTile(
+              leading: const Icon(Icons.notifications),
+              title: const Text("Notification"),
+              selected: _currentPage == PageType.notification,
+              onTap: () => _navigateToPage(PageType.notification),
+            ),
+            ListTile(
+              leading: const Icon(Icons.file_upload),
+              title: const Text("Importation"),
+              selected: _currentPage == PageType.importation,
+              onTap: () => _navigateToPage(PageType.importation),
+            ),
           ],
         ),
       ),
       body: Center(
         child: Text(
-          "Bienvenue dans ${_titles[_selectedIndex]}",
+          "Bienvenue dans ${_getTitle(_currentPage)}",
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
