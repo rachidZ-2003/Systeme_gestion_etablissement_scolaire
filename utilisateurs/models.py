@@ -109,6 +109,7 @@ class Eleve(Utilisateur):
     photo = models.ImageField(upload_to="eleves_photos/", null=True, blank=True)
 
 
+
 class AncienEleve(models.Model):
     eleve = models.ForeignKey(
         "Eleve",

@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/administration/', include('administration.urls')), # Add administration app URLs
     path('api/communication/', include('communication.urls')), # Add notifications app URLs
     path('api/parents/',include('parents.urls')),
+    path('api/pedagogie/',include('pedagogie.urls')),
 ]
 
 if settings.DEBUG:
