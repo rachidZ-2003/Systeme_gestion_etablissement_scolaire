@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .models import Eleve, Utilisateur, ChefEtablissement, Caissier, Censeur, Enseignant, AncienEleve, Parent
 from .serializers import (
@@ -17,14 +18,15 @@ class UtilisateurViewSet(viewsets.ModelViewSet):
     queryset = Utilisateur.objects.all()
     serializer_class = UtilisateurSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
+    #authentication_classes = [JWTAuthentication]
 
 
 class EleveViewSet(viewsets.ModelViewSet):
     queryset = Eleve.objects.all()
     serializer_class = EleveSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]
+    parser_classes = [MultiPartParser, FormParser] 
+    #authentication_classes = [JWTAuthentication]
 
 
 class AncienEleveViewSet(viewsets.ModelViewSet):

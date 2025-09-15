@@ -49,7 +49,7 @@ class UtilisateurSerializer(serializers.ModelSerializer):
 # ----------------- Eleve -----------------
 class EleveSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
-    photo = serializers.CharField(allow_null=True, required=False)
+    photo = serializers.ImageField(required=False, allow_null=True)
     date_inscription = serializers.DateField(default=timezone.now().date)
 
     class Meta:

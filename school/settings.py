@@ -1,9 +1,14 @@
 from pathlib import Path
 from datetime import timedelta
+import os
 
+# ================= BASE DIR =================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-zx$!l)&4htl9nz))o_9+)9ck14j(r=su!reh$_@875u0=i$gyq'
+# ================= SECRET KEY =================
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-dev-key')
+
+# ================= DEBUG =================
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2']
@@ -19,7 +24,6 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'rest_framework',
-    'rest_framework_simplejwt',
 
     'scolarite',
     'administration',
@@ -47,6 +51,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
     "http://10.0.2.2:8080",
 ]
+
+# Si tu veux autoriser toutes les origines pendant le dev
+# CORS_ALLOW_ALL_ORIGINS = True
 
 # ================= TEMPLATES =================
 TEMPLATES = [{
@@ -113,5 +120,5 @@ LOGGING = {
     },
 }
 
+# ================= URLS =================
 ROOT_URLCONF = 'school.urls'
-DEBUG = True
