@@ -1,0 +1,7 @@
+# .gitignore
+db.sqlite3
+pedagogie/__pycache__/
+*.pyc
+pedagogie/migrations/
+utilisateurs/__pycache__/
+env/
