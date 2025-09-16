@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'parent_subscription_screen.dart';
 import 'package:school_flutter/administration/parent/parent_bashbord.dart';
 import 'parent_registration_screen.dart';
+import 'package:school_flutter/administration/acceuil/pulic_home_screens.dart';
 
 
 /// --------------------
@@ -41,8 +42,13 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
   }
 
   void _goBack() {
-    Navigator.of(context).pop();
-  }
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (context) => const PublicHomeScreen()),
+    (Route<dynamic> route) => false, // supprime tout l’historique
+  );
+}
+
 
   void _goToRegister() {
     Navigator.push(
@@ -146,7 +152,7 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 107, 238, 255),
+                              color: Color.fromARGB(255, 107, 255, 243),
                               width: 2,
                             ),
                           ),
@@ -185,7 +191,7 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 107, 233, 255),
+                              color: Color.fromARGB(255, 107, 250, 255),
                               width: 2,
                             ),
                           ),
@@ -216,7 +222,7 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                         child: ElevatedButton(
                           onPressed: _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 107, 188, 255),
+                            backgroundColor: const Color.fromARGB(255, 107, 208, 255),
                             foregroundColor: Colors.white,
                             elevation: 2,
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -348,7 +354,7 @@ class _ParentInterfaceState extends State<ParentInterface> {
               leading: const Icon(Icons.workspaces),
               title: const Text('Espace de travail'),
               onTap: () {
-                _navigateToPage(context, const parentEspaceLogin());
+                _navigateToPage(context, const ParentDashboard());
               },
             ),
             const Divider(), // Sépare la déconnexion des autres onglets

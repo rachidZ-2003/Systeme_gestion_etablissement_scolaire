@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:school_flutter/screens/student/auth/student_login_screen.dart';
 import 'student_subscription_screen.dart';
-
-
+import 'package:school_flutter/administration/eleve/demande.dart';
+import 'package:school_flutter/screens/student/auth/student_login_screen.dart';
 class StudentLoginScreen extends StatefulWidget {
   const StudentLoginScreen({super.key});
-
   @override
   State<StudentLoginScreen> createState() => _StudentLoginScreenState();
 }
-
 class _StudentLoginScreenState extends State<StudentLoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
   bool _obscurePassword = true; // 🔑 Pour gérer l'affichage du mot de passe
-
   void _login() {
     if (_emailController.text == "eleve" &&
         _passwordController.text == "1234") {
@@ -36,18 +31,15 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
       );
     }
   }
-
   void _goBack() {
     Navigator.of(context).pop();
   }
-
   void _goToRegister() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const StudentSubscriptionScreen()),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,7 +108,6 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 32),
-
                       // Identifiant
                       TextField(
                         controller: _emailController,
@@ -154,7 +145,6 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
                       // Mot de passe avec icône "œil"
                       TextField(
                         controller: _passwordController,
@@ -206,7 +196,6 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-
                       // Bouton Connexion
                       SizedBox(
                         width: double.infinity,
@@ -230,14 +219,10 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 20),
-
-                    
-
+                   
                       const SizedBox(height: 20),
-
-                      //  Nouveau bouton "Créer un compte"
+                      // Nouveau bouton "Créer un compte"
                      TextButton(
   onPressed: _goToRegister,
   style: TextButton.styleFrom(
@@ -265,7 +250,6 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
     ],
   ),
 ),
-
                     ],
                   ),
                 ),
@@ -287,22 +271,15 @@ class StudentWorkspaceScreen extends StatefulWidget {
 class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
   String currentPage = "Accueil";
 
+  // Méthode de navigation pour les onglets "internes"
   void _navigateTo(String page) {
     setState(() {
       currentPage = page;
     });
-    Navigator.pop(context); // Ferme le Drawer
-    
-    // Afficher un message pour indiquer la navigation
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Page active : $page"),
-        duration: const Duration(seconds: 2),
-        backgroundColor: const Color.fromARGB(255, 107, 188, 255),
-      ),
-    );
+    Navigator.pop(context); // Ferme le drawer
   }
 
+  // Déconnexion
   void _logout() {
     Navigator.pop(context); // Ferme le drawer
     Navigator.pushReplacement(
@@ -311,12 +288,11 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
     );
   }
 
+  // Contenu affiché selon l'onglet
   Widget _getPageContent() {
     switch (currentPage) {
       case "Accueil":
         return _buildHomeContent();
-      case "Faire une Demande":
-        return _buildRequestContent();
       case "Consulter Demandes":
         return _buildConsultContent();
       case "Notifications":
@@ -328,60 +304,22 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
     }
   }
 
+  // ---------------- Contenus ----------------
   Widget _buildHomeContent() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.home,
-            size: 80,
-            color: Color.fromARGB(255, 107, 147, 255),
-          ),
+          const Icon(Icons.home, size: 80, color: Color.fromARGB(255, 107, 147, 255)),
           const SizedBox(height: 20),
           const Text(
             "Bienvenue dans ton espace élève 🎓",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3748),
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
           ),
           const SizedBox(height: 10),
           Text(
             "Utilise le menu pour naviguer dans tes services",
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRequestContent() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.edit_document,
-            size: 80,
-            color: Colors.blue,
-          ),
-          SizedBox(height: 20),
-          Text(
-            "Faire une Demande",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 10),
-          Text(
-            "Formulaire de demande à venir...",
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -393,24 +331,11 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.list_alt,
-            size: 80,
-            color: Colors.purple,
-          ),
+          Icon(Icons.list_alt, size: 80, color: Colors.purple),
           SizedBox(height: 20),
-          Text(
-            "Consulter tes Demandes",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text("Consulter tes Demandes", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           SizedBox(height: 10),
-          Text(
-            "Liste des demandes à venir...",
-            style: TextStyle(fontSize: 16),
-          ),
+          Text("Liste des demandes à venir...", style: TextStyle(fontSize: 16)),
         ],
       ),
     );
@@ -421,24 +346,11 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.notifications,
-            size: 80,
-            color: Colors.orange,
-          ),
+          Icon(Icons.notifications, size: 80, color: Colors.orange),
           SizedBox(height: 20),
-          Text(
-            "Notifications",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text("Notifications", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           SizedBox(height: 10),
-          Text(
-            "Aucune nouvelle notification",
-            style: TextStyle(fontSize: 16),
-          ),
+          Text("Aucune nouvelle notification", style: TextStyle(fontSize: 16)),
         ],
       ),
     );
@@ -449,29 +361,17 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.location_on,
-            size: 80,
-            color: Colors.red,
-          ),
+          Icon(Icons.location_on, size: 80, color: Colors.red),
           SizedBox(height: 20),
-          Text(
-            "Localiser l'Établissement",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text("Localiser l'Établissement", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           SizedBox(height: 10),
-          Text(
-            "Carte et informations à venir...",
-            style: TextStyle(fontSize: 16),
-          ),
+          Text("Carte et informations à venir...", style: TextStyle(fontSize: 16)),
         ],
       ),
     );
   }
 
+  // ---------------- Build Scaffold ----------------
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -496,249 +396,108 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                   ],
                 ),
               ),
-              accountName: const Text(
-                "Élève Connecté",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              accountName: const Text("Élève Connecté", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               accountEmail: const Text("eleve@education.bf"),
               currentAccountPicture: const CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.school,
-                  color: Color.fromARGB(255, 107, 208, 255),
-                  size: 40,
-                ),
+                child: Icon(Icons.school, color: Color.fromARGB(255, 107, 208, 255), size: 40),
               ),
             ),
-            
-            // Menu principal
+
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
                   // Accueil
                   ListTile(
-                    leading: Icon(
-                      Icons.home,
-                      color: currentPage == "Accueil" 
-                          ? const Color.fromARGB(255, 107, 225, 255) 
-                          : Colors.grey[600],
-                    ),
+                    leading: Icon(Icons.home, color: currentPage == "Accueil" ? const Color.fromARGB(255, 107, 225, 255) : Colors.grey[600]),
                     title: Text(
                       "Accueil",
                       style: TextStyle(
-                        fontWeight: currentPage == "Accueil" 
-                            ? FontWeight.bold 
-                            : FontWeight.normal,
-                        color: currentPage == "Accueil"
-                            ? const Color.fromARGB(255, 107, 208, 255)
-                            : Colors.black87,
+                        fontWeight: currentPage == "Accueil" ? FontWeight.bold : FontWeight.normal,
+                        color: currentPage == "Accueil" ? const Color.fromARGB(255, 107, 208, 255) : Colors.black87,
                       ),
                     ),
-                    selected: currentPage == "Accueil",
-                    selectedTileColor: const Color.fromARGB(255, 107, 220, 255).withOpacity(0.1),
                     onTap: () => _navigateTo("Accueil"),
                   ),
-                  
                   const Divider(height: 1),
-                  
-                  // Section Services
+
+                  // SERVICES label
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    child: Text(
-                      "SERVICES",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600],
-                        letterSpacing: 1,
-                      ),
-                    ),
+                    child: Text("SERVICES", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey[600], letterSpacing: 1)),
                   ),
-                  
-                  // Faire une demande
+
+                  // Faire une demande (redirection vers DemandeFormScreen)
                   ListTile(
-                    leading: Icon(
-                      Icons.edit_document,
-                      color: currentPage == "Faire une Demande" 
-                          ? Colors.blue 
-                          : Colors.grey[600],
-                    ),
-                    title: Text(
-                      "Faire une Demande",
-                      style: TextStyle(
-                        fontWeight: currentPage == "Faire une Demande" 
-                            ? FontWeight.bold 
-                            : FontWeight.normal,
-                        color: currentPage == "Faire une Demande"
-                            ? Colors.blue
-                            : Colors.black87,
-                      ),
-                    ),
-                    selected: currentPage == "Faire une Demande",
-                    selectedTileColor: Colors.blue.withOpacity(0.1),
-                    onTap: () => _navigateTo("Faire une Demande"),
+                    leading: const Icon(Icons.edit, color: Colors.blue),
+                    title: const Text("Faire une Demande", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                    onTap: () {
+                      Navigator.pop(context); // ferme le drawer
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const DemandeFormScreen()),
+                      );
+                    },
                   ),
-                  
+
                   // Consulter demandes
                   ListTile(
-                    leading: Icon(
-                      Icons.list_alt,
-                      color: currentPage == "Consulter Demandes" 
-                          ? Colors.purple 
-                          : Colors.grey[600],
-                    ),
-                    title: Text(
-                      "Consulter Demandes",
-                      style: TextStyle(
-                        fontWeight: currentPage == "Consulter Demandes" 
-                            ? FontWeight.bold 
-                            : FontWeight.normal,
-                        color: currentPage == "Consulter Demandes"
-                            ? Colors.purple
-                            : Colors.black87,
-                      ),
-                    ),
-                    selected: currentPage == "Consulter Demandes",
-                    selectedTileColor: Colors.purple.withOpacity(0.1),
+                    leading: Icon(Icons.list_alt, color: currentPage == "Consulter Demandes" ? Colors.purple : Colors.grey[600]),
+                    title: Text("Consulter Demandes", style: TextStyle(fontWeight: currentPage == "Consulter Demandes" ? FontWeight.bold : FontWeight.normal, color: currentPage == "Consulter Demandes" ? Colors.purple : Colors.black87)),
                     onTap: () => _navigateTo("Consulter Demandes"),
                   ),
-                  
+
                   // Notifications
                   ListTile(
-                    leading: Stack(
-                      children: [
-                        Icon(
-                          Icons.notifications,
-                          color: currentPage == "Notifications" 
-                              ? Colors.orange 
-                              : Colors.grey[600],
-                        ),
-                        // Badge pour les notifications (optionnel)
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 12,
-                              minHeight: 12,
-                            ),
-                            child: const Text(
-                              '3',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    title: Text(
-                      "Notifications",
-                      style: TextStyle(
-                        fontWeight: currentPage == "Notifications" 
-                            ? FontWeight.bold 
-                            : FontWeight.normal,
-                        color: currentPage == "Notifications"
-                            ? Colors.orange
-                            : Colors.black87,
-                      ),
-                    ),
-                    selected: currentPage == "Notifications",
-                    selectedTileColor: Colors.orange.withOpacity(0.1),
+                    leading: Icon(Icons.notifications, color: currentPage == "Notifications" ? Colors.orange : Colors.grey[600]),
+                    title: Text("Notifications", style: TextStyle(fontWeight: currentPage == "Notifications" ? FontWeight.bold : FontWeight.normal, color: currentPage == "Notifications" ? Colors.orange : Colors.black87)),
                     onTap: () => _navigateTo("Notifications"),
                   ),
-                  
+
                   // Localiser établissement
                   ListTile(
-                    leading: Icon(
-                      Icons.location_on,
-                      color: currentPage == "Localiser Établissement" 
-                          ? Colors.red 
-                          : Colors.grey[600],
-                    ),
-                    title: Text(
-                      "Localiser Établissement",
-                      style: TextStyle(
-                        fontWeight: currentPage == "Localiser Établissement" 
-                            ? FontWeight.bold 
-                            : FontWeight.normal,
-                        color: currentPage == "Localiser Établissement"
-                            ? Colors.red
-                            : Colors.black87,
-                      ),
-                    ),
-                    selected: currentPage == "Localiser Établissement",
-                    selectedTileColor: Colors.red.withOpacity(0.1),
+                    leading: Icon(Icons.location_on, color: currentPage == "Localiser Établissement" ? Colors.red : Colors.grey[600]),
+                    title: Text("Localiser Établissement", style: TextStyle(fontWeight: currentPage == "Localiser Établissement" ? FontWeight.bold : FontWeight.normal, color: currentPage == "Localiser Établissement" ? Colors.red : Colors.black87)),
                     onTap: () => _navigateTo("Localiser Établissement"),
                   ),
-                  
+
                   const Divider(),
-                  
-                  // Section Compte
+
+                  // COMPTE label
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    child: Text(
-                      "COMPTE",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600],
-                        letterSpacing: 1,
-                      ),
-                    ),
+                    child: Text("COMPTE", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey[600], letterSpacing: 1)),
                   ),
-                  
-                  // Se connecter en tant qu'élève (optionnel si déjà connecté)
+
+                  // Profil élève
                   ListTile(
-                    leading: Icon(
-                      Icons.person_outline,
-                      color: Colors.grey[600],
-                    ),
-                    title: const Text(
-                      "Profil Élève",
-                      style: TextStyle(color: Colors.black87),
-                    ),
+                    leading: Icon(Icons.person_outline, color: Colors.grey[600]),
+                    title: const Text("Profil Élève", style: TextStyle(color: Colors.black87)),
                     onTap: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const StudentLogin(), 
-                        ),
+                        MaterialPageRoute(builder: (_) => const StudentLogin()),
                       );
                     },
                   ),
                 ],
               ),
             ),
-            
-            // Section déconnexion (en bas)
+
+            // Déconnexion
             const Divider(height: 1),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text(
-                "Déconnexion",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              title: const Text("Déconnexion", style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500)),
               onTap: _logout,
             ),
             const SizedBox(height: 8),
           ],
         ),
       ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: _getPageContent(),
-      ),
+
+      // Contenu principal
+      body: AnimatedSwitcher(duration: const Duration(milliseconds: 300), child: _getPageContent()),
     );
   }
 }

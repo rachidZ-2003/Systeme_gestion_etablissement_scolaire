@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_flutter/administration/parent/dasboard_basique_parent.dart'; 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -10,11 +11,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Roboto',
       ),
-      home: const parentEspaceLogin(),
+      home: const ParentDashboard(),
     );
   }
 }
-
+/*
 /// --------------------
 /// PAGE DE CONNEXION - PARENT
 /// --------------------
@@ -239,7 +240,7 @@ class _parentEspaceLoginState extends State<parentEspaceLogin> {
       ),
     );
   }
-}
+}*/
 
 /// --------------------
 /// DASHBOARD - PARENT
@@ -290,7 +291,7 @@ class _ParentDashboardState extends State<ParentDashboard> {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const parentEspaceLogin()),
+                MaterialPageRoute(builder: (context) => const ParentLoginScreen()),
               );
             },
           ),
@@ -378,7 +379,7 @@ class _ParentDashboardState extends State<ParentDashboard> {
                           ),
                         ),
                         selected: i == _selectedIndex,
-                        selectedTileColor: const Color.fromARGB(255, 107, 213, 255).withOpacity(0.1),
+                        selectedTileColor: const Color.fromARGB(255, 107, 233, 255).withOpacity(0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -422,7 +423,7 @@ class _ParentDashboardState extends State<ParentDashboard> {
                   Icon(
                     _icons[_selectedIndex],
                     size: 64,
-                    color: const Color.fromARGB(255, 107, 225, 255),
+                    color: const Color.fromARGB(255, 107, 245, 255),
                   ),
                   const SizedBox(height: 20),
                   Text(

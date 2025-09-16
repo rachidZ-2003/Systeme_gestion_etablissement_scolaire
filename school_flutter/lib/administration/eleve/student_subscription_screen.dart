@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:http_parser/http_parser.dart'; // Pour MediaType
 import 'package:mime/mime.dart'; // Pour détecter automatiquement le type MIME
 
@@ -32,6 +31,9 @@ class _StudentSubscriptionScreenState extends State<StudentSubscriptionScreen> {
   final ImagePicker _imagePicker = ImagePicker();
   final List<String> _genreOptions = ['M', 'F'];
 
+  bool _showPassword = false;
+  bool _showConfirmPassword = false;
+
   @override
   void dispose() {
     _nomController.dispose();
@@ -57,11 +59,6 @@ class _StudentSubscriptionScreenState extends State<StudentSubscriptionScreen> {
         _photoBytes = bytes;
         _photoName = image.name;
       });
-      debugPrint(
-        '📷 Image sélectionnée: $_photoName, taille: ${bytes.length} bytes',
-      );
-    } else {
-      debugPrint('❌ Aucune image sélectionnée');
     }
   }
 
@@ -78,21 +75,19 @@ class _StudentSubscriptionScreenState extends State<StudentSubscriptionScreen> {
         _dateNaissanceController.text =
             "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
       });
-      debugPrint(
-        '📅 Date de naissance sélectionnée: ${_dateNaissanceController.text}',
-      );
     }
   }
 
   Future<void> _submitSubscription() async {
     if (!_formKey.currentState!.validate()) {
-      debugPrint('❌ Formulaire invalide');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Formulaire invalide')),
+      );
       return;
     }
 
     if (_passwordController.text.trim() !=
         _confirmPasswordController.text.trim()) {
-      debugPrint('❌ Les mots de passe ne correspondent pas');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Les mots de passe ne correspondent pas')),
       );
@@ -100,27 +95,25 @@ class _StudentSubscriptionScreenState extends State<StudentSubscriptionScreen> {
     }
 
     final uri = Uri.parse('http://127.0.0.1:8000/api/utilisateurs/eleves/');
-    final Map<String, String> fields = {
-      'nom': _nomController.text.trim(),
-      'prenom': _prenomController.text.trim(),
-      'email': _emailController.text.trim(),
-      'telephone': _telephoneController.text.trim(),
-      'date_naissance': _dateNaissanceController.text,
-      'genre': _selectedGenre ?? '',
-      'password': _passwordController.text.trim(),
-    };
-
-    debugPrint('📝 Données à envoyer: $fields');
 
     try {
       var request = http.MultipartRequest('POST', uri);
-      request.fields.addAll(fields);
 
+      // Champs du formulaire
+      request.fields.addAll({
+        'nom': _nomController.text.trim(),
+        'prenom': _prenomController.text.trim(),
+        'email': _emailController.text.trim(),
+        'telephone': _telephoneController.text.trim(),
+        'date_naissance': _dateNaissanceController.text.trim(),
+        'genre': _selectedGenre ?? '',
+        'password': _passwordController.text.trim(),
+      });
+
+      // Ajout de la photo si elle existe
       if (_photoBytes != null && _photoName != null) {
         final mimeType = lookupMimeType(_photoName!) ?? 'image/jpeg';
         final split = mimeType.split('/');
-        debugPrint('📷 Ajout du fichier: $_photoName, type MIME: $mimeType');
-
         request.files.add(
           http.MultipartFile.fromBytes(
             'photo',
@@ -129,140 +122,213 @@ class _StudentSubscriptionScreenState extends State<StudentSubscriptionScreen> {
             contentType: MediaType(split[0], split[1]),
           ),
         );
-      } else {
-        debugPrint('⚠️ Aucun fichier photo envoyé');
       }
 
-      debugPrint('⏳ Envoi de la requête au serveur...');
+      // Envoi de la requête
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      debugPrint('📬 Status code: ${response.statusCode}');
-      debugPrint('📬 Body: ${response.body}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Élève créé avec succès !')),
         );
+        // Optionnel : revenir à la page précédente ou écran de connexion
+        Navigator.pop(context);
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erreur: ${response.body}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur API: ${response.body}')),
+        );
       }
     } catch (e) {
-      debugPrint('❌ Erreur lors de l\'envoi: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur: $e')),
+      );
     }
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    bool obscure = false,
+    Widget? suffixIcon,
+    void Function()? onTap,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscure,
+        decoration: InputDecoration(
+          labelText: label,
+          border: InputBorder.none,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          suffixIcon: suffixIcon,
+        ),
+        readOnly: onTap != null,
+        onTap: onTap,
+        keyboardType: keyboardType,
+        validator: validator,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Inscription Élève')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: _pickImage,
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundImage:
-                      _photoBytes != null ? MemoryImage(_photoBytes!) : null,
-                  child:
-                      _photoBytes == null
-                          ? const Icon(Icons.add_a_photo, size: 40)
-                          : null,
+      appBar: AppBar(
+        title: const Text('Inscription Élève'),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: Container(
+        color: const Color(0xFFF5F5F7),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 60,
+                    backgroundColor: Colors.grey[200],
+                    backgroundImage:
+                        _photoBytes != null ? MemoryImage(_photoBytes!) : null,
+                    child: _photoBytes == null
+                        ? const Icon(Icons.add_a_photo, size: 40)
+                        : null,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _nomController,
-                decoration: const InputDecoration(labelText: 'Nom *'),
-                validator: (v) => v == null || v.isEmpty ? 'Nom requis' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _prenomController,
-                decoration: const InputDecoration(labelText: 'Prénom *'),
-                validator:
-                    (v) => v == null || v.isEmpty ? 'Prénom requis' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email *'),
-                validator: (v) {
-                  if (v == null || v.isEmpty) return 'Email requis';
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v))
-                    return 'Email invalide';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Mot de passe *'),
-                obscureText: true,
-                validator:
-                    (v) =>
-                        v == null || v.isEmpty ? 'Mot de passe requis' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _confirmPasswordController,
-                decoration: const InputDecoration(
-                  labelText: 'Confirmer le mot de passe *',
+                const SizedBox(height: 20),
+                _buildTextField(
+                  controller: _nomController,
+                  label: 'Nom *',
+                  validator: (v) => v == null || v.isEmpty ? 'Nom requis' : null,
                 ),
-                obscureText: true,
-                validator:
-                    (v) =>
-                        v == null || v.isEmpty ? 'Confirmation requise' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _telephoneController,
-                decoration: const InputDecoration(labelText: 'Téléphone *'),
-                validator:
-                    (v) => v == null || v.isEmpty ? 'Téléphone requis' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _dateNaissanceController,
-                readOnly: true,
-                onTap: _selectDate,
-                decoration: const InputDecoration(
-                  labelText: 'Date de naissance *',
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _prenomController,
+                  label: 'Prénom *',
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Prénom requis' : null,
                 ),
-                validator:
-                    (v) => v == null || v.isEmpty ? 'Date requise' : null,
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _selectedGenre,
-                decoration: const InputDecoration(labelText: 'Genre *'),
-                items:
-                    _genreOptions
-                        .map(
-                          (g) => DropdownMenuItem(
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _emailController,
+                  label: 'Email *',
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Email requis';
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(v)) return 'Email invalide';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _passwordController,
+                  label: 'Mot de passe *',
+                  obscure: !_showPassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        _showPassword ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _showPassword = !_showPassword;
+                      });
+                    },
+                  ),
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Mot de passe requis' : null,
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _confirmPasswordController,
+                  label: 'Confirmer mot de passe *',
+                  obscure: !_showConfirmPassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(_showConfirmPassword
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _showConfirmPassword = !_showConfirmPassword;
+                      });
+                    },
+                  ),
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Confirmation requise' : null,
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _telephoneController,
+                  label: 'Téléphone *',
+                  keyboardType: TextInputType.phone,
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Téléphone requis' : null,
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _dateNaissanceController,
+                  label: 'Date de naissance *',
+                  onTap: _selectDate,
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Date requise' : null,
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _selectedGenre,
+                  decoration: const InputDecoration(
+                    labelText: 'Genre *',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
+                  items: _genreOptions
+                      .map((g) => DropdownMenuItem(
                             value: g,
                             child: Text(g == 'M' ? 'Masculin' : 'Féminin'),
-                          ),
-                        )
-                        .toList(),
-                onChanged: (v) => setState(() => _selectedGenre = v),
-                validator: (v) => v == null ? 'Genre requis' : null,
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _submitSubscription,
-                child: const Text('Créer le compte'),
-              ),
-            ],
+                          ))
+                      .toList(),
+                  onChanged: (v) => setState(() => _selectedGenre = v),
+                  validator: (v) => v == null ? 'Genre requis' : null,
+                ),
+                const SizedBox(height: 32),
+                Container(
+                  width: double.infinity,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: const LinearGradient(
+                      colors: [Colors.blueAccent, Colors.lightBlue],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: _submitSubscription,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Créer le compte',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
       ),
