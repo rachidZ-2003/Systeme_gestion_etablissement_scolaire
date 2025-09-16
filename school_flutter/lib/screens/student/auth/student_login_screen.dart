@@ -129,13 +129,13 @@ class _StudentLoginState extends State<StudentLogin> {
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 107, 255, 127).withOpacity(0.1),
+                            color: const Color.fromARGB(255, 107, 250, 255).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(40),
                           ),
                           child: const Icon(
                             Icons.school,
                             size: 40,
-                            color: Color.fromARGB(255, 107, 255, 127),
+                            color: Color.fromARGB(255, 107, 238, 255),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -171,7 +171,7 @@ class _StudentLoginState extends State<StudentLogin> {
                             hintText: "Saisissez votre INE",
                             prefixIcon: const Icon(
                               Icons.person_outline,
-                              color: Color.fromARGB(255, 107, 255, 127),
+                              color: Color.fromARGB(255, 107, 255, 255),
                             ),
                             hintStyle: TextStyle(
                               color: Colors.grey[600],
@@ -194,7 +194,7 @@ class _StudentLoginState extends State<StudentLogin> {
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(
-                                color: Color.fromARGB(255, 107, 255, 139),
+                                color: Color.fromARGB(255, 107, 255, 235),
                                 width: 2,
                               ),
                             ),
@@ -225,7 +225,7 @@ class _StudentLoginState extends State<StudentLogin> {
                             hintText: "Saisissez votre Matricule",
                             prefixIcon: const Icon(
                               Icons.lock_outline,
-                              color: Color.fromARGB(255, 107, 255, 127),
+                              color: Color.fromARGB(255, 107, 255, 243),
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -261,7 +261,7 @@ class _StudentLoginState extends State<StudentLogin> {
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(
-                                color: Color.fromARGB(255, 107, 255, 156),
+                                color: Color.fromARGB(255, 107, 233, 255),
                                 width: 2,
                               ),
                             ),
@@ -286,7 +286,7 @@ class _StudentLoginState extends State<StudentLogin> {
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _handleLogin,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 107, 255, 127),
+                              backgroundColor: const Color.fromARGB(255, 107, 233, 255),
                               foregroundColor: Colors.white,
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(vertical: 16),

@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "SchoolMap",
-      theme: ThemeData(primarySwatch: Colors.green),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: const ChefLogin(),
     );
   }
@@ -158,7 +158,7 @@ class _ChefLoginState extends State<ChefLogin> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 107, 255, 174),
+                              color: Color.fromARGB(255, 107, 208, 255),
                               width: 2,
                             ),
                           ),
@@ -197,7 +197,7 @@ class _ChefLoginState extends State<ChefLogin> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 107, 255, 164),
+                              color: Color.fromARGB(255, 107, 213, 255),
                               width: 2,
                             ),
                           ),
@@ -215,7 +215,7 @@ class _ChefLoginState extends State<ChefLogin> {
                         child: ElevatedButton(
                           onPressed: _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 107, 255, 144),
+                            backgroundColor: const Color.fromARGB(255, 107, 176, 255),
                             foregroundColor: Colors.white,
                             elevation: 2,
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -233,48 +233,9 @@ class _ChefLoginState extends State<ChefLogin> {
                         ),
                       ),
                       
-                      const SizedBox(height: 20),
+                    
                       
-                      // Bouton de retour principal
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.green.shade300,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: TextButton(
-                          onPressed: _goBack,
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.green.shade700,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.arrow_back,
-                                size: 20,
-                                color: Colors.green.shade700,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                "Retour à l'accueil",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.green.shade700,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                    
                     ],
                   ),
                 ),
@@ -411,7 +372,7 @@ class _ChefEtablissementDashboardState extends State<ChefEtablissementDashboard>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green.shade800,
+        backgroundColor: const Color.fromARGB(255, 46, 78, 125),
         title: Text("SchoolMap - ${_getTitle(_currentPage)}"),
         actions: [
           IconButton(
@@ -442,8 +403,8 @@ class _ChefEtablissementDashboardState extends State<ChefEtablissementDashboard>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Colors.green.shade800,
-                    Colors.green.shade600,
+                    const Color.fromARGB(255, 46, 109, 125),
+                    const Color.fromARGB(255, 67, 126, 160),
                   ],
                 ),
               ),

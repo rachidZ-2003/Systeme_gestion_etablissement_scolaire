@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -11,7 +10,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Roboto',
       ),
-      home: const ParentLoginScreen(),
+      home: const parentEspaceLogin(),
     );
   }
 }
@@ -19,14 +18,14 @@ class MyApp extends StatelessWidget {
 /// --------------------
 /// PAGE DE CONNEXION - PARENT
 /// --------------------
-class ParentLoginScreen extends StatefulWidget {
-  const ParentLoginScreen({super.key});
+class parentEspaceLogin extends StatefulWidget {
+  const parentEspaceLogin({super.key});
 
   @override
-  State<ParentLoginScreen> createState() => _ParentLoginScreenState();
+  State<parentEspaceLogin> createState() => _parentEspaceLoginState();
 }
 
-class _ParentLoginScreenState extends State<ParentLoginScreen> {
+class _parentEspaceLoginState extends State<parentEspaceLogin> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -154,7 +153,7 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 107, 255, 139),
+                              color: Color.fromARGB(255, 107, 184, 255),
                               width: 2,
                             ),
                           ),
@@ -193,7 +192,7 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 107, 255, 139),
+                              color: Color.fromARGB(255, 107, 225, 255),
                               width: 2,
                             ),
                           ),
@@ -211,7 +210,7 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                         child: ElevatedButton(
                           onPressed: _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 107, 255, 164),
+                            backgroundColor: const Color.fromARGB(255, 107, 188, 255),
                             foregroundColor: Colors.white,
                             elevation: 2,
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -229,48 +228,7 @@ class _ParentLoginScreenState extends State<ParentLoginScreen> {
                         ),
                       ),
                       
-                      const SizedBox(height: 20),
-                      
-                      // Bouton de retour alternatif
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: TextButton(
-                          onPressed: _goBack,
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.grey[700],
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.arrow_back,
-                                size: 20,
-                                color: Colors.grey[700],
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                "Retour à l'accueil",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[700],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                    
                     ],
                   ),
                 ),
@@ -316,7 +274,7 @@ class _ParentDashboardState extends State<ParentDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 107, 255, 169),
+        backgroundColor: const Color.fromARGB(255, 107, 176, 255),
         foregroundColor: Colors.white,
         title: Text(
           "Parent - ${_titles[_selectedIndex]}",
@@ -332,7 +290,7 @@ class _ParentDashboardState extends State<ParentDashboard> {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const ParentLoginScreen()),
+                MaterialPageRoute(builder: (context) => const parentEspaceLogin()),
               );
             },
           ),
@@ -358,8 +316,8 @@ class _ParentDashboardState extends State<ParentDashboard> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color.fromARGB(255, 107, 255, 164),
-                    Color.fromARGB(255, 92, 246, 125),
+                    Color.fromARGB(255, 107, 201, 255),
+                    Color.fromARGB(255, 92, 202, 246),
                   ],
                 ),
               ),
@@ -410,17 +368,17 @@ class _ParentDashboardState extends State<ParentDashboard> {
                       child: ListTile(
                         leading: Icon(
                           _icons[i],
-                          color: i == _selectedIndex ? const Color.fromARGB(255, 107, 255, 181) : Colors.grey[600],
+                          color: i == _selectedIndex ? const Color.fromARGB(255, 107, 188, 255) : Colors.grey[600],
                         ),
                         title: Text(
                           _titles[i],
                           style: TextStyle(
-                            color: i == _selectedIndex ? const Color.fromARGB(255, 107, 255, 144) : Colors.grey[800],
+                            color: i == _selectedIndex ? const Color.fromARGB(255, 107, 220, 255) : Colors.grey[800],
                             fontWeight: i == _selectedIndex ? FontWeight.w600 : FontWeight.normal,
                           ),
                         ),
                         selected: i == _selectedIndex,
-                        selectedTileColor: const Color.fromARGB(255, 107, 255, 132).withOpacity(0.1),
+                        selectedTileColor: const Color.fromARGB(255, 107, 213, 255).withOpacity(0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -464,7 +422,7 @@ class _ParentDashboardState extends State<ParentDashboard> {
                   Icon(
                     _icons[_selectedIndex],
                     size: 64,
-                    color: const Color.fromARGB(255, 107, 255, 144),
+                    color: const Color.fromARGB(255, 107, 225, 255),
                   ),
                   const SizedBox(height: 20),
                   Text(

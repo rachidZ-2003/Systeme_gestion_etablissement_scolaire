@@ -23,7 +23,7 @@ class _ChefEtablissementbashboardTemplateState extends State<ChefEtablissementba
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard Chef Établissement'),
-        backgroundColor: const Color.fromARGB(255, 45, 72, 72),
+        backgroundColor:  Colors.blue,
       ),
       drawer: Drawer(
         child: ListView(
@@ -31,8 +31,8 @@ class _ChefEtablissementbashboardTemplateState extends State<ChefEtablissementba
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 45, 72, 68),
-              ),
+                color: Colors.blue,
+        ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -498,7 +498,7 @@ class _TemplateChefLoginState extends State<TemplateChefLogin> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 107, 255, 174),
+                              color: Color.fromARGB(255, 107, 196, 255),
                               width: 2,
                             ),
                           ),
@@ -537,7 +537,7 @@ class _TemplateChefLoginState extends State<TemplateChefLogin> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 107, 255, 164),
+                              color: Color.fromARGB(255, 107, 201, 255),
                               width: 2,
                             ),
                           ),
@@ -555,7 +555,7 @@ class _TemplateChefLoginState extends State<TemplateChefLogin> {
                         child: ElevatedButton(
                           onPressed: _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 107, 255, 144),
+                            backgroundColor: const Color.fromARGB(255, 107, 176, 255),
                             foregroundColor: Colors.white,
                             elevation: 2,
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -573,48 +573,9 @@ class _TemplateChefLoginState extends State<TemplateChefLogin> {
                         ),
                       ),
                       
-                      const SizedBox(height: 20),
                       
-                      // Bouton de retour principal
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.green.shade300,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: TextButton(
-                          onPressed: _goBack,
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.green.shade700,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.arrow_back,
-                                size: 20,
-                                color: Colors.green.shade700,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                "Retour à l'accueil",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.green.shade700,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      
+                    
                     ],
                   ),
                 ),

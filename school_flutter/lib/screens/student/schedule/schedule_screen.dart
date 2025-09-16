@@ -36,6 +36,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
     return Scaffold(
       appBar: AppBar(
+         automaticallyImplyLeading: false,
         title: const Text("Emploi du temps"),
         backgroundColor: Colors.teal,
       ),

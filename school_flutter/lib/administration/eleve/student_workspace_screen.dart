@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_flutter/screens/student/auth/student_login_screen.dart';
+import 'student_subscription_screen.dart';
 
 
 class StudentLoginScreen extends StatefulWidget {
@@ -10,12 +11,13 @@ class StudentLoginScreen extends StatefulWidget {
 }
 
 class _StudentLoginScreenState extends State<StudentLoginScreen> {
-  final _ineController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  bool _obscurePassword = true; // 🔑 Pour gérer l'affichage du mot de passe
+
   void _login() {
-    // Identifiants fixes provisoires
-    if (_ineController.text == "INE123" &&
+    if (_emailController.text == "eleve" &&
         _passwordController.text == "1234") {
       Navigator.pushReplacement(
         context,
@@ -23,19 +25,33 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Identifiants incorrects")),
+        SnackBar(
+          content: const Text("Identifiants incorrects"),
+          backgroundColor: Colors.red[400],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     }
   }
 
-  // Fonction pour gérer le retour
   void _goBack() {
     Navigator.of(context).pop();
+  }
+
+  void _goToRegister() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const StudentSubscriptionScreen()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // AppBar avec bouton retour
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -69,8 +85,8 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFE8E8F5), // Couleur lilas très claire
-              Color(0xFFF5F5F5), // Blanc cassé
+              Color(0xFFE8E8F5),
+              Color(0xFFF5F5F5),
             ],
           ),
         ),
@@ -92,7 +108,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                     children: [
                       // Titre
                       const Text(
-                        "Connexion - élève",
+                        "Connexion - Elève",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
@@ -100,12 +116,12 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      
-                      // Champ Identifiant
+
+                      // Identifiant
                       TextField(
-                        controller: _ineController,
+                        controller: _emailController,
                         decoration: InputDecoration(
-                          hintText: "Identifiant",
+                          hintText: "Identifiant (eleve)",
                           hintStyle: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 16,
@@ -127,7 +143,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 107, 255, 139),
+                              color: Color.fromARGB(255, 107, 184, 255),
                               width: 2,
                             ),
                           ),
@@ -138,13 +154,13 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      
-                      // Champ Mot de passe
+
+                      // Mot de passe avec icône "œil"
                       TextField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: _obscurePassword,
                         decoration: InputDecoration(
-                          hintText: "Mot de passe",
+                          hintText: "Mot de passe (1234)",
                           hintStyle: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 16,
@@ -166,7 +182,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 107, 255, 156),
+                              color: Color.fromARGB(255, 107, 184, 255),
                               width: 2,
                             ),
                           ),
@@ -174,19 +190,32 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                             horizontal: 16,
                             vertical: 16,
                           ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey[600],
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
                         ),
                       ),
                       const SizedBox(height: 24),
-                      
-                      // Bouton de connexion
+
+                      // Bouton Connexion
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 107, 255, 127),
+                            backgroundColor: const Color.fromARGB(255, 107, 171, 255),
                             foregroundColor: Colors.white,
-                            elevation: 0,
+                            elevation: 2,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -201,38 +230,42 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                           ),
                         ),
                       ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // Bouton de retour alternatif (optionnel)
-                      SizedBox(
-                        width: double.infinity,
-                        child: TextButton(
-                          onPressed: _goBack,
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.grey[600],
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.arrow_back,
-                                size: 18,
-                                color: Colors.grey[600],
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                "Retour à l'accueil",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+
+                      const SizedBox(height: 20),
+
+                    
+
+                      const SizedBox(height: 20),
+
+                      //  Nouveau bouton "Créer un compte"
+                     TextButton(
+  onPressed: _goToRegister,
+  style: TextButton.styleFrom(
+    foregroundColor: const Color(0xFF2D3748),
+    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+  ),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: const [
+      Icon(
+        Icons.person_add_alt_1_rounded, // Icône inscription
+        size: 20,
+        color: Color(0xFF2D3748),
+      ),
+      SizedBox(width: 8),
+      Text(
+        "Pas de compte ? Créez-en un",
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          decoration: TextDecoration.underline,
+          color: Color(0xFF2D3748),
+        ),
+      ),
+    ],
+  ),
+),
+
                     ],
                   ),
                 ),
@@ -244,7 +277,6 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
     );
   }
 }
-
 class StudentWorkspaceScreen extends StatefulWidget {
   const StudentWorkspaceScreen({super.key});
 
@@ -266,7 +298,7 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
       SnackBar(
         content: Text("Page active : $page"),
         duration: const Duration(seconds: 2),
-        backgroundColor: const Color.fromARGB(255, 107, 255, 127),
+        backgroundColor: const Color.fromARGB(255, 107, 188, 255),
       ),
     );
   }
@@ -304,7 +336,7 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
           const Icon(
             Icons.home,
             size: 80,
-            color: Color.fromARGB(255, 107, 255, 127),
+            color: Color.fromARGB(255, 107, 147, 255),
           ),
           const SizedBox(height: 20),
           const Text(
@@ -445,7 +477,7 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Dashboard Élève - $currentPage"),
-        backgroundColor: const Color.fromARGB(255, 107, 255, 156),
+        backgroundColor: const Color.fromARGB(255, 107, 117, 255),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -459,8 +491,8 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color.fromARGB(255, 107, 255, 156),
-                    Color.fromARGB(255, 80, 220, 120),
+                    Color.fromARGB(255, 107, 208, 255),
+                    Color.fromARGB(255, 80, 199, 220),
                   ],
                 ),
               ),
@@ -473,7 +505,7 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                 backgroundColor: Colors.white,
                 child: Icon(
                   Icons.school,
-                  color: Color.fromARGB(255, 107, 255, 156),
+                  color: Color.fromARGB(255, 107, 208, 255),
                   size: 40,
                 ),
               ),
@@ -489,7 +521,7 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                     leading: Icon(
                       Icons.home,
                       color: currentPage == "Accueil" 
-                          ? const Color.fromARGB(255, 107, 255, 156) 
+                          ? const Color.fromARGB(255, 107, 225, 255) 
                           : Colors.grey[600],
                     ),
                     title: Text(
@@ -499,12 +531,12 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                             ? FontWeight.bold 
                             : FontWeight.normal,
                         color: currentPage == "Accueil"
-                            ? const Color.fromARGB(255, 107, 255, 156)
+                            ? const Color.fromARGB(255, 107, 208, 255)
                             : Colors.black87,
                       ),
                     ),
                     selected: currentPage == "Accueil",
-                    selectedTileColor: const Color.fromARGB(255, 107, 255, 156).withOpacity(0.1),
+                    selectedTileColor: const Color.fromARGB(255, 107, 220, 255).withOpacity(0.1),
                     onTap: () => _navigateTo("Accueil"),
                   ),
                   
