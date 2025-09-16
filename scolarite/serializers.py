@@ -32,6 +32,15 @@ class CoefficientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class DemandeSerializer(serializers.ModelSerializer):
+     #Pour afficher un champ lisible au lieu d’un ID
+    eleve_nom = serializers.StringRelatedField(source="eleve", read_only=True)
+    etablissement_nom = serializers.StringRelatedField(source="etablissement", read_only=True)
+    salle_nom = serializers.StringRelatedField(source="salle", read_only=True)
+
+    # Pour que les fichiers renvoient l’URL complète
+    bulletin = serializers.FileField(required=False, allow_null=True)
+    dernier_diplome = serializers.FileField(required=False, allow_null=True)
+    photo = serializers.ImageField(required=False, allow_null=True)
     class Meta:
         model = Demande
         fields = '__all__'

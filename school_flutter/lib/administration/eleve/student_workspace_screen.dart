@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:school_flutter/screens/student/auth/student_login_screen.dart';
 import 'student_subscription_screen.dart';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class StudentLoginScreen extends StatefulWidget {
   const StudentLoginScreen({super.key});
@@ -16,24 +17,45 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
 
   bool _obscurePassword = true; // 🔑 Pour gérer l'affichage du mot de passe
 
-  void _login() {
-    if (_emailController.text == "eleve" &&
-        _passwordController.text == "1234") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const StudentWorkspaceScreen()),
-      );
-    } else {
+  void _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text("Identifiants incorrects"),
-          backgroundColor: Colors.red[400],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
+        const SnackBar(content: Text("Veuillez remplir tous les champs")),
       );
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse(
+          "http://127.0.0.1:8000/api/utilisateurs/login/",
+        ), // ← ton endpoint login
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email, "password": password}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token =
+            data["access"]; // si ton API retourne {"access": "JWT..."}
+
+        // TODO : sauvegarder le token dans SharedPreferences
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const StudentWorkspaceScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Identifiants incorrects")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
     }
   }
 
@@ -44,7 +66,9 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
   void _goToRegister() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const StudentSubscriptionScreen()),
+      MaterialPageRoute(
+        builder: (context) => const StudentSubscriptionScreen(),
+      ),
     );
   }
 
@@ -84,10 +108,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFE8E8F5),
-              Color(0xFFF5F5F5),
-            ],
+            colors: [Color(0xFFE8E8F5), Color(0xFFF5F5F5)],
           ),
         ),
         child: Center(
@@ -130,15 +151,11 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                           fillColor: Colors.grey[50],
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.grey[300]!,
-                            ),
+                            borderSide: BorderSide(color: Colors.grey[300]!),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.grey[300]!,
-                            ),
+                            borderSide: BorderSide(color: Colors.grey[300]!),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -169,15 +186,11 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                           fillColor: Colors.grey[50],
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.grey[300]!,
-                            ),
+                            borderSide: BorderSide(color: Colors.grey[300]!),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.grey[300]!,
-                            ),
+                            borderSide: BorderSide(color: Colors.grey[300]!),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -213,7 +226,12 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                         child: ElevatedButton(
                           onPressed: _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 107, 171, 255),
+                            backgroundColor: const Color.fromARGB(
+                              255,
+                              107,
+                              171,
+                              255,
+                            ),
                             foregroundColor: Colors.white,
                             elevation: 2,
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -233,39 +251,40 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
 
                       const SizedBox(height: 20),
 
-                    
-
                       const SizedBox(height: 20),
 
                       //  Nouveau bouton "Créer un compte"
-                     TextButton(
-  onPressed: _goToRegister,
-  style: TextButton.styleFrom(
-    foregroundColor: const Color(0xFF2D3748),
-    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-  ),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: const [
-      Icon(
-        Icons.person_add_alt_1_rounded, // Icône inscription
-        size: 20,
-        color: Color(0xFF2D3748),
-      ),
-      SizedBox(width: 8),
-      Text(
-        "Pas de compte ? Créez-en un",
-        style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-          decoration: TextDecoration.underline,
-          color: Color(0xFF2D3748),
-        ),
-      ),
-    ],
-  ),
-),
-
+                      TextButton(
+                        onPressed: _goToRegister,
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF2D3748),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 16,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              Icons
+                                  .person_add_alt_1_rounded, // Icône inscription
+                              size: 20,
+                              color: Color(0xFF2D3748),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              "Pas de compte ? Créez-en un",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                decoration: TextDecoration.underline,
+                                color: Color(0xFF2D3748),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -277,6 +296,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
     );
   }
 }
+
 class StudentWorkspaceScreen extends StatefulWidget {
   const StudentWorkspaceScreen({super.key});
 
@@ -292,7 +312,7 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
       currentPage = page;
     });
     Navigator.pop(context); // Ferme le Drawer
-    
+
     // Afficher un message pour indiquer la navigation
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -350,10 +370,7 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
           const SizedBox(height: 10),
           Text(
             "Utilise le menu pour naviguer dans tes services",
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -365,18 +382,11 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.edit_document,
-            size: 80,
-            color: Colors.blue,
-          ),
+          Icon(Icons.edit_document, size: 80, color: Colors.blue),
           SizedBox(height: 20),
           Text(
             "Faire une Demande",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10),
           Text(
@@ -393,24 +403,14 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.list_alt,
-            size: 80,
-            color: Colors.purple,
-          ),
+          Icon(Icons.list_alt, size: 80, color: Colors.purple),
           SizedBox(height: 20),
           Text(
             "Consulter tes Demandes",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10),
-          Text(
-            "Liste des demandes à venir...",
-            style: TextStyle(fontSize: 16),
-          ),
+          Text("Liste des demandes à venir...", style: TextStyle(fontSize: 16)),
         ],
       ),
     );
@@ -421,24 +421,14 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.notifications,
-            size: 80,
-            color: Colors.orange,
-          ),
+          Icon(Icons.notifications, size: 80, color: Colors.orange),
           SizedBox(height: 20),
           Text(
             "Notifications",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10),
-          Text(
-            "Aucune nouvelle notification",
-            style: TextStyle(fontSize: 16),
-          ),
+          Text("Aucune nouvelle notification", style: TextStyle(fontSize: 16)),
         ],
       ),
     );
@@ -449,18 +439,11 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.location_on,
-            size: 80,
-            color: Colors.red,
-          ),
+          Icon(Icons.location_on, size: 80, color: Colors.red),
           SizedBox(height: 20),
           Text(
             "Localiser l'Établissement",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10),
           Text(
@@ -510,7 +493,7 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                 ),
               ),
             ),
-            
+
             // Menu principal
             Expanded(
               child: ListView(
@@ -520,28 +503,36 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                   ListTile(
                     leading: Icon(
                       Icons.home,
-                      color: currentPage == "Accueil" 
-                          ? const Color.fromARGB(255, 107, 225, 255) 
-                          : Colors.grey[600],
+                      color:
+                          currentPage == "Accueil"
+                              ? const Color.fromARGB(255, 107, 225, 255)
+                              : Colors.grey[600],
                     ),
                     title: Text(
                       "Accueil",
                       style: TextStyle(
-                        fontWeight: currentPage == "Accueil" 
-                            ? FontWeight.bold 
-                            : FontWeight.normal,
-                        color: currentPage == "Accueil"
-                            ? const Color.fromARGB(255, 107, 208, 255)
-                            : Colors.black87,
+                        fontWeight:
+                            currentPage == "Accueil"
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                        color:
+                            currentPage == "Accueil"
+                                ? const Color.fromARGB(255, 107, 208, 255)
+                                : Colors.black87,
                       ),
                     ),
                     selected: currentPage == "Accueil",
-                    selectedTileColor: const Color.fromARGB(255, 107, 220, 255).withOpacity(0.1),
+                    selectedTileColor: const Color.fromARGB(
+                      255,
+                      107,
+                      220,
+                      255,
+                    ).withOpacity(0.1),
                     onTap: () => _navigateTo("Accueil"),
                   ),
-                  
+
                   const Divider(height: 1),
-                  
+
                   // Section Services
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -555,64 +546,71 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // Faire une demande
                   ListTile(
                     leading: Icon(
                       Icons.edit_document,
-                      color: currentPage == "Faire une Demande" 
-                          ? Colors.blue 
-                          : Colors.grey[600],
+                      color:
+                          currentPage == "Faire une Demande"
+                              ? Colors.blue
+                              : Colors.grey[600],
                     ),
                     title: Text(
                       "Faire une Demande",
                       style: TextStyle(
-                        fontWeight: currentPage == "Faire une Demande" 
-                            ? FontWeight.bold 
-                            : FontWeight.normal,
-                        color: currentPage == "Faire une Demande"
-                            ? Colors.blue
-                            : Colors.black87,
+                        fontWeight:
+                            currentPage == "Faire une Demande"
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                        color:
+                            currentPage == "Faire une Demande"
+                                ? Colors.blue
+                                : Colors.black87,
                       ),
                     ),
                     selected: currentPage == "Faire une Demande",
                     selectedTileColor: Colors.blue.withOpacity(0.1),
                     onTap: () => _navigateTo("Faire une Demande"),
                   ),
-                  
+
                   // Consulter demandes
                   ListTile(
                     leading: Icon(
                       Icons.list_alt,
-                      color: currentPage == "Consulter Demandes" 
-                          ? Colors.purple 
-                          : Colors.grey[600],
+                      color:
+                          currentPage == "Consulter Demandes"
+                              ? Colors.purple
+                              : Colors.grey[600],
                     ),
                     title: Text(
                       "Consulter Demandes",
                       style: TextStyle(
-                        fontWeight: currentPage == "Consulter Demandes" 
-                            ? FontWeight.bold 
-                            : FontWeight.normal,
-                        color: currentPage == "Consulter Demandes"
-                            ? Colors.purple
-                            : Colors.black87,
+                        fontWeight:
+                            currentPage == "Consulter Demandes"
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                        color:
+                            currentPage == "Consulter Demandes"
+                                ? Colors.purple
+                                : Colors.black87,
                       ),
                     ),
                     selected: currentPage == "Consulter Demandes",
                     selectedTileColor: Colors.purple.withOpacity(0.1),
                     onTap: () => _navigateTo("Consulter Demandes"),
                   ),
-                  
+
                   // Notifications
                   ListTile(
                     leading: Stack(
                       children: [
                         Icon(
                           Icons.notifications,
-                          color: currentPage == "Notifications" 
-                              ? Colors.orange 
-                              : Colors.grey[600],
+                          color:
+                              currentPage == "Notifications"
+                                  ? Colors.orange
+                                  : Colors.grey[600],
                         ),
                         // Badge pour les notifications (optionnel)
                         Positioned(
@@ -643,45 +641,50 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                     title: Text(
                       "Notifications",
                       style: TextStyle(
-                        fontWeight: currentPage == "Notifications" 
-                            ? FontWeight.bold 
-                            : FontWeight.normal,
-                        color: currentPage == "Notifications"
-                            ? Colors.orange
-                            : Colors.black87,
+                        fontWeight:
+                            currentPage == "Notifications"
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                        color:
+                            currentPage == "Notifications"
+                                ? Colors.orange
+                                : Colors.black87,
                       ),
                     ),
                     selected: currentPage == "Notifications",
                     selectedTileColor: Colors.orange.withOpacity(0.1),
                     onTap: () => _navigateTo("Notifications"),
                   ),
-                  
+
                   // Localiser établissement
                   ListTile(
                     leading: Icon(
                       Icons.location_on,
-                      color: currentPage == "Localiser Établissement" 
-                          ? Colors.red 
-                          : Colors.grey[600],
+                      color:
+                          currentPage == "Localiser Établissement"
+                              ? Colors.red
+                              : Colors.grey[600],
                     ),
                     title: Text(
                       "Localiser Établissement",
                       style: TextStyle(
-                        fontWeight: currentPage == "Localiser Établissement" 
-                            ? FontWeight.bold 
-                            : FontWeight.normal,
-                        color: currentPage == "Localiser Établissement"
-                            ? Colors.red
-                            : Colors.black87,
+                        fontWeight:
+                            currentPage == "Localiser Établissement"
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                        color:
+                            currentPage == "Localiser Établissement"
+                                ? Colors.red
+                                : Colors.black87,
                       ),
                     ),
                     selected: currentPage == "Localiser Établissement",
                     selectedTileColor: Colors.red.withOpacity(0.1),
                     onTap: () => _navigateTo("Localiser Établissement"),
                   ),
-                  
+
                   const Divider(),
-                  
+
                   // Section Compte
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -695,7 +698,7 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // Se connecter en tant qu'élève (optionnel si déjà connecté)
                   ListTile(
                     leading: Icon(
@@ -708,16 +711,14 @@ class _StudentWorkspaceScreenState extends State<StudentWorkspaceScreen> {
                     ),
                     onTap: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const StudentLogin(), 
-                        ),
+                        MaterialPageRoute(builder: (_) => const StudentLogin()),
                       );
                     },
                   ),
                 ],
               ),
             ),
-            
+
             // Section déconnexion (en bas)
             const Divider(height: 1),
             ListTile(

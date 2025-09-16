@@ -33,41 +33,53 @@ class DemandeViewSet(viewsets.ModelViewSet):
     queryset = Demande.objects.all()
     serializer_class = DemandeSerializer
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['get'])
     def consulter(self, request, pk=None):
-        """Permet au chef de voir les détails d’une demande avant décision"""
+        """Permet au chef de voir les détails d’une demande"""
         demande = self.get_object()
         return Response({
             "eleve": str(demande.eleve),
             "etablissement": str(demande.etablissement),
-            "niveau_demande": demande.niveau,
-            "statut": demande.statut
+            "statut": demande.statut,
+            "date_demande": demande.date_demande,
+            "classes_disponibles": DemandeSerializer(demande).get_classes_disponibles(demande)
         }, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
     def valider(self, request, pk=None):
-        """Validation de la demande + création de l’ancien élève"""
+        """Validation de la demande + création de l’ancien élève avec salle attribuée"""
         demande = self.get_object()
 
         if demande.statut != "en_attente":
             return Response({"error": "Cette demande a déjà été traitée."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Classe choisie par l'élève
+        classe_id = request.data.get("classe_id")
+        if not classe_id:
+            return Response({"error": "Vous devez fournir la classe choisie par l’élève."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            classe = Classe.objects.get(id=classe_id)
+        except Classe.DoesNotExist:
+            return Response({"error": "Classe introuvable."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Salle attribuée par le chef
         salle_id = request.data.get("salle_id")
         if not salle_id:
-            return Response({"error": "Vous devez fournir une salle pour l’élève."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Vous devez attribuer une salle pour l’élève."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             salle = Salle.objects.get(id=salle_id)
+            if salle not in classe.salle.all() and salle.id != classe.salle.id:  # si relation 1-n
+                return Response({"error": "La salle attribuée n'appartient pas à cette classe."}, status=status.HTTP_400_BAD_REQUEST)
         except Salle.DoesNotExist:
             return Response({"error": "Salle introuvable."}, status=status.HTTP_404_NOT_FOUND)
 
-        eleve = demande.eleve
-
         # Création de l'ancien élève
         ancien = AncienEleve.objects.create(
-            eleve=eleve,                # lien OneToOne avec l'élève
+            eleve=demande.eleve,
             matricule=generate_matricule(),
-            niveau="N/A",               # ou le niveau de la demande
+            niveau=classe.nom,
             salle=salle
         )
 
@@ -78,19 +90,19 @@ class DemandeViewSet(viewsets.ModelViewSet):
             "status": "Demande validée",
             "ancien_eleve_id": ancien.id,
             "matricule": ancien.matricule,
+            "classe": classe.nom,
             "salle": salle.nom
         }, status=status.HTTP_200_OK)
 
-
     @action(detail=True, methods=['post'])
     def rejeter(self, request, pk=None):
+        """Rejeter une demande"""
         demande = self.get_object()
         if demande.statut != "en_attente":
             return Response({"error": "Cette demande a déjà été traitée."}, status=status.HTTP_400_BAD_REQUEST)
         demande.statut = "refusee"
         demande.save()
         return Response({"status": "Demande rejetée"}, status=status.HTTP_200_OK)
-
 
 class InscriptionViewSet(viewsets.ModelViewSet):
     queryset = Inscription.objects.all()

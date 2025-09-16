@@ -1,9 +1,10 @@
 from django.db import models
+from smart_selects.db_fields import ChainedForeignKey
 
 # Create your models here.
 # scolarite/models.py
 from django.db import models
-from administration.models import Classe, Etablissement, Periode # Ensure Periode is imported from administration
+from administration.models import Classe, Etablissement,Salle, Periode # Ensure Periode is imported from administration
 from utilisateurs.models import Eleve
 from utilisateurs.models import AncienEleve # Corrected import for AncienEleve
 
@@ -29,15 +30,36 @@ class Coefficient(models.Model):
 class Demande(models.Model):
     eleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     etablissement = models.ForeignKey(Etablissement, on_delete=models.CASCADE)
+
+    # Salle dépendante de l’établissement via smart-selects
+    salle = ChainedForeignKey(
+        Salle,
+        chained_field="etablissement",                 # champ de Demande qui fait la liaison
+        chained_model_field="batiment__etablissement", # relation dans Salle
+        show_all=False,
+        auto_choose=True,
+        sort=True,
+        on_delete=models.CASCADE
+    )
+
+    # Pièces jointes
+    bulletin = models.FileField(upload_to="demandes/bulletins/", null=True, blank=True)
+    dernier_diplome = models.FileField(upload_to="demandes/diplomes/", null=True, blank=True)
+    photo = models.ImageField(upload_to="demandes/photos/", null=True, blank=True)
+
     date_demande = models.DateField(auto_now_add=True)
     statut = models.CharField(
         max_length=20,
-        choices=[("en_attente", "En attente"), ("acceptee", "Acceptée"), ("refusee", "Refusée")],
+        choices=[
+            ("en_attente", "En attente"),
+            ("acceptee", "Acceptée"),
+            ("refusee", "Refusée"),
+        ],
         default="en_attente"
     )
 
     def __str__(self):
-        return f"Demande {self.eleve} -> {self.etablissement} ({self.statut})"
+        return f"Demande de {self.eleve} pour {self.etablissement} - {self.salle} [{self.statut}]"
 
 class Inscription(models.Model):
     ancien_eleve = models.ForeignKey(AncienEleve, on_delete=models.CASCADE, related_name="inscriptions") # Changed to AncienEleve

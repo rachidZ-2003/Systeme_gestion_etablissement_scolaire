@@ -24,6 +24,7 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'rest_framework',
+    "smart_selects",
 
     'scolarite',
     'administration',
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
     'pedagogie',
     'communication',
     'parents',
+    
 ]
 
 # ================= MIDDLEWARE =================
