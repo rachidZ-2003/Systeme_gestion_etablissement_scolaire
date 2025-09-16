@@ -135,7 +135,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
    void _navigateToParentWorkspace() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const parentEspaceLogin()),
+      MaterialPageRoute(builder: (context) => const ParentDashboard()),
     );
   }
 
