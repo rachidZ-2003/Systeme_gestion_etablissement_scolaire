@@ -7,6 +7,7 @@ from .models import Note, Devoir, Absence, Trimestre, Seance, Pourcentage
 # Note
 # ---------------------------
 class NoteSerializer(serializers.ModelSerializer):
+    trimestre = serializers.PrimaryKeyRelatedField(queryset=Trimestre.objects.all())
     class Meta:
         model = Note
         fields = '__all__'
@@ -17,8 +18,7 @@ class NoteSerializer(serializers.ModelSerializer):
 # ---------------------------
 class DevoirSerializer(serializers.ModelSerializer):
     # On inclut aussi le pourcentage (relation ForeignKey)
-    pourcentage = serializers.StringRelatedField(read_only=True)
-
+    pourcentage = serializers.PrimaryKeyRelatedField(queryset=Pourcentage.objects.all())
     class Meta:
         model = Devoir
         fields = '__all__'

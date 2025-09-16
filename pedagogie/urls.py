@@ -4,7 +4,7 @@ from .views import (
     NoteViewSet, DevoirViewSet, AbsenceViewSet, TrimestreViewSet,
     #EmploiDuTempsViewSet, 
     PourcentageViewSet,SeanceViewSet,
-    get_moyennes_tous_eleves, get_classement_global_trimestre, get_classement_global_annuelle,emploi_salle_pdf
+    get_moyennes_tous_eleves, get_classement_global_trimestre, get_classement_global_annuelle,emploi_salle_pdf,bulletin_pdf
 )
 
 # ---------------------------
@@ -26,6 +26,7 @@ urlpatterns = [
     path('classement/global/trimestre/<int:trimestre_id>/', get_classement_global_trimestre, name='classement_global_trimestre'),
     path('classement/global/annuelle/<str:annee_scolaire>/', get_classement_global_annuelle, name='classement_global_annuelle'),
     path('emplois-temps/salle/<int:salle_id>/pdf/', emploi_salle_pdf, name='emploi_salle_pdf'),
+    path("bulletin/<int:ancien_eleve_id>/<int:trimestre_id>/", bulletin_pdf, name="bulletin_pdf"),
 
 
     # Ajout des routes du router

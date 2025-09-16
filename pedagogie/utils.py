@@ -1,65 +1,55 @@
 # pedagogie/utils.py
-from django.db.models import F, Sum, FloatField, Case, When, Value
-from .models import Note, Trimestre, AncienEleve,Salle,Seance
-from django.template.loader import render_to_string
-from weasyprint import HTML
-import tempfile
+from django.db.models import F
+from .models import Note, Trimestre, AncienEleve, Salle
 
 # ==========================
 # Moyennes
 # ==========================
 
-def moyenne_par_eleve(ancien_eleve_id, annee_scolaire=None):
-    """
-    Moyenne générale toutes matières pour un élève
-    """
-    notes = Note.objects.filter(ancien_eleve_id=ancien_eleve_id)
-    if annee_scolaire:
-        notes = notes.filter(devoir__creneaux__emploi_du_temps__annee_scolaire=annee_scolaire)
-
-    result = notes.aggregate(
-        total=Sum(
-            Case(
-                When(bareme__gt=0, then=F('valeur') / F('bareme') * F('devoir__note_max')),
-                default=Value(0),
-                output_field=FloatField()
-            )
-        ),
-        coef=Sum(F('devoir__note_max'), output_field=FloatField())
-    )
-
-    return round(result['total'] / result['coef'], 2) if result['coef'] else 0
-
-
 def moyenne_par_matiere(ancien_eleve_id, cours_id, annee_scolaire=None):
     """
-    Moyenne d'un élève pour une matière spécifique
+    Moyenne pondérée d'un élève pour une matière spécifique
+    en tenant compte du pourcentage de chaque devoir.
     """
     notes = Note.objects.filter(
         ancien_eleve_id=ancien_eleve_id,
-        devoir__creneaux__seance__enseignement__cours__id=cours_id
+        devoir__cours_id=cours_id
     )
     if annee_scolaire:
-        notes = notes.filter(devoir__creneaux__emploi_du_temps__annee_scolaire=annee_scolaire)
+        notes = notes.filter(devoir__annee_scolaire=annee_scolaire)
 
-    result = notes.aggregate(
-        total=Sum(
-            Case(
-                When(bareme__gt=0, devoir__isnull=False, then=F('valeur') / F('bareme') * F('devoir__note_max')),
-                default=Value(0),
-                output_field=FloatField()
-            )
-        ),
-        coef=Sum(
-            Case(
-                When(devoir__isnull=False, then=F('devoir__note_max')),
-                default=Value(0),
-                output_field=FloatField()
-            )
-        )
-    )
+    total_pondere = 0
+    total_pourcentage = 0
 
-    return round(result['total'] / result['coef'], 2) if result['coef'] else 0
+    for note in notes:
+        if note.valeur is not None and note.devoir.pourcentage:
+            pond = note.valeur * note.devoir.pourcentage.valeur / 100
+            total_pondere += pond
+            total_pourcentage += note.devoir.pourcentage.valeur
+
+    if total_pourcentage == 0:
+        return 0
+    return round(total_pondere / total_pourcentage, 2)
+
+
+def moyenne_par_eleve(ancien_eleve_id, annee_scolaire=None):
+    """
+    Moyenne générale de toutes matières pour un élève
+    """
+    cours_ids = Note.objects.filter(ancien_eleve_id=ancien_eleve_id)
+    if annee_scolaire:
+        cours_ids = cours_ids.filter(devoir__annee_scolaire=annee_scolaire)
+    cours_ids = cours_ids.values_list('devoir__cours_id', flat=True).distinct()
+
+    moyennes = []
+    for cid in cours_ids:
+        m = moyenne_par_matiere(ancien_eleve_id, cid, annee_scolaire)
+        if m:
+            moyennes.append(m)
+
+    if not moyennes:
+        return 0
+    return round(sum(moyennes) / len(moyennes), 2)
 
 
 def moyenne_par_eleve_trimestre(ancien_eleve_id, trimestre_id):
@@ -69,13 +59,19 @@ def moyenne_par_eleve_trimestre(ancien_eleve_id, trimestre_id):
     trimestre = Trimestre.objects.get(id=trimestre_id)
     notes = Note.objects.filter(
         ancien_eleve_id=ancien_eleve_id,
-        devoir__creneaux__seance__date__range=(trimestre.date_debut, trimestre.date_fin)
+        devoir__date_devoir__range=(trimestre.date_debut, trimestre.date_fin)
     )
-    result = notes.aggregate(
-        total=Sum(F('valeur') / F('bareme') * F('devoir__note_max'), output_field=FloatField()),
-        coef=Sum(F('devoir__note_max'), output_field=FloatField())
-    )
-    return round(result['total'] / result['coef'], 2) if result['coef'] else 0
+
+    matieres_ids = notes.values_list('devoir__cours_id', flat=True).distinct()
+    moyennes = []
+    for cid in matieres_ids:
+        m = moyenne_par_matiere(ancien_eleve_id, cid)
+        if m:
+            moyennes.append(m)
+
+    if not moyennes:
+        return 0
+    return round(sum(moyennes) / len(moyennes), 2)
 
 
 def moyenne_par_eleve_annuelle(ancien_eleve_id, annee_scolaire):
@@ -84,17 +80,23 @@ def moyenne_par_eleve_annuelle(ancien_eleve_id, annee_scolaire):
     """
     notes = Note.objects.filter(
         ancien_eleve_id=ancien_eleve_id,
-        devoir__creneaux__emploi_du_temps__annee_scolaire=annee_scolaire
+        devoir__annee_scolaire=annee_scolaire
     )
-    result = notes.aggregate(
-        total=Sum(F('valeur') / F('bareme') * F('devoir__note_max'), output_field=FloatField()),
-        coef=Sum(F('devoir__note_max'), output_field=FloatField())
-    )
-    return round(result['total'] / result['coef'], 2) if result['coef'] else 0
+
+    matieres_ids = notes.values_list('devoir__cours_id', flat=True).distinct()
+    moyennes = []
+    for cid in matieres_ids:
+        m = moyenne_par_matiere(ancien_eleve_id, cid, annee_scolaire)
+        if m:
+            moyennes.append(m)
+
+    if not moyennes:
+        return 0
+    return round(sum(moyennes) / len(moyennes), 2)
 
 
 # ==========================
-# Classement
+# Classements
 # ==========================
 
 def _calcul_classement(anciens_eleves, fonction_moyenne):
@@ -151,5 +153,3 @@ def classement_global_annuelle(annee_scolaire):
     Classement global tous élèves pour l'année scolaire
     """
     return _calcul_classement(AncienEleve.objects.all(), lambda ae_id: moyenne_par_eleve_annuelle(ae_id, annee_scolaire))
-
-

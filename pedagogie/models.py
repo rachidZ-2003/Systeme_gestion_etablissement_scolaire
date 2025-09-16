@@ -10,10 +10,13 @@ class Trimestre(models.Model):
     nom = models.CharField(max_length=50)
     date_debut = models.DateField()
     date_fin = models.DateField()
-    periode = models.ForeignKey(Periode, on_delete=models.CASCADE, related_name='trimestres')
+    periode = models.ForeignKey(
+        Periode, on_delete=models.CASCADE, related_name='trimestres'
+    )
 
     def __str__(self):
         return f"{self.nom} - {self.periode}"
+
 
 
 # ---------------------------
@@ -93,7 +96,7 @@ class Devoir(models.Model):
     description = models.TextField(blank=True)
     cours = models.ForeignKey(Cours, on_delete=models.CASCADE, related_name='devoirs')
     seance = models.ForeignKey(Seance, on_delete=models.CASCADE, related_name='devoirs', null=True, blank=True)
-    pourcentage = models.ForeignKey(Pourcentage, on_delete=models.CASCADE, related_name='devoirs',default=0.0)
+    pourcentage = models.ForeignKey(Pourcentage, on_delete=models.CASCADE, related_name='devoirs')
 
     date_publication = models.DateField()
     date_devoir = models.DateField()
@@ -110,12 +113,13 @@ class Devoir(models.Model):
 class Note(models.Model):
     devoir = models.ForeignKey(Devoir, on_delete=models.CASCADE, related_name='notes')
     ancien_eleve = models.ForeignKey(AncienEleve, on_delete=models.CASCADE, related_name='notes')
+    trimestre = models.ForeignKey(Trimestre, on_delete=models.CASCADE, related_name='notes')  # 🔥 ajout ici
     valeur = models.FloatField(null=True, blank=True)
     remarque = models.TextField(blank=True)
     bareme = models.FloatField(default=20)
 
     class Meta:
-        unique_together = (('devoir', 'ancien_eleve'),)
+        unique_together = (('devoir', 'ancien_eleve', 'trimestre'),)  # 🔥 unique par devoir + élève + trimestre
 
     def __str__(self):
-        return f"{self.ancien_eleve} - {self.devoir} : {self.valeur}/{self.bareme}"
+        return f"{self.ancien_eleve} - {self.devoir} ({self.trimestre.nom}) : {self.valeur}/{self.bareme}"

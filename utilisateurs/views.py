@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser ,JSONParser
 
 from .models import Eleve, Utilisateur, ChefEtablissement, Caissier, Censeur, Enseignant, AncienEleve, Parent
 from .serializers import (
@@ -25,7 +25,7 @@ class EleveViewSet(viewsets.ModelViewSet):
     queryset = Eleve.objects.all()
     serializer_class = EleveSerializer
     permission_classes = [AllowAny]
-    parser_classes = [MultiPartParser, FormParser] 
+    parser_classes = [MultiPartParser, FormParser ,JSONParser] 
     #authentication_classes = [JWTAuthentication]
 
 
