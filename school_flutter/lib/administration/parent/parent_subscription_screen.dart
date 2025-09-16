@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:school_flutter/administration/parent/parent_bashbord.dart';
+import 'package:school_flutter/administration/parent/cadr.dart';
+import 'mobile.dart';
 
 class ParentSubscriptionScreen extends StatefulWidget {
   const ParentSubscriptionScreen({super.key});
@@ -12,18 +14,11 @@ class ParentSubscriptionScreen extends StatefulWidget {
 class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _matriculeController = TextEditingController();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
   
   bool _isMatriculeValid = false;
-  bool _isPasswordVisible = false;
-  bool _isConfirmPasswordVisible = false;
-  bool _isLoading = false;
   bool _isVerifyingMatricule = false;
   Map<String, dynamic>? _studentData;
 
-  // Données fictives pour la démonstration (remplacez par votre API ou base de données)
   final Map<String, Map<String, dynamic>> _mockDatabase = {
     'MAT123': {
       'nom': 'Jean Dupont', 
@@ -48,9 +43,6 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
   @override
   void dispose() {
     _matriculeController.dispose();
-    _usernameController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -66,8 +58,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
       _isVerifyingMatricule = true;
     });
 
-    // Simulation d'un appel API
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1)); // Simule l'appel API
 
     if (_mockDatabase.containsKey(matricule)) {
       setState(() {
@@ -86,72 +77,13 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
     }
   }
 
-  Future<void> _submitSubscription() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    if (!_isMatriculeValid) {
-      _showSnackBar('Veuillez d\'abord vérifier le matricule', isError: true);
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      // Simulation d'un appel API pour créer le compte
-      await Future.delayed(const Duration(seconds: 2));
-      
-      // TODO: Remplacer par votre appel API réel
-      // await ApiService.createParentAccount({
-      //   'username': _usernameController.text.trim(),
-      //   'password': _passwordController.text,
-      //   'matricule': _matriculeController.text.trim().toUpperCase(),
-      //   'studentData': _studentData,
-      // });
-
-      _showSnackBar('Compte parent créé avec succès !', isError: false);
-      
-      // Attendre un peu avant de naviguer pour que l'utilisateur voie le message
-      await Future.delayed(const Duration(seconds: 1));
-      
-      if (mounted) {
-        Navigator.pop(context); 
-         _navigateToParentWorkspace();
-      }
-    } catch (e) {
-      _showSnackBar('Erreur lors de la création du compte: $e', isError: true);
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-   
-  }
-   void _navigateToParentWorkspace() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ParentDashboard()),
-    );
-  }
-
   void _showSnackBar(String message, {required bool isError}) {
     if (!mounted) return;
-    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: isError ? Colors.red : Colors.green,
         duration: Duration(seconds: isError ? 4 : 2),
-        action: SnackBarAction(
-          label: 'OK',
-          textColor: Colors.white,
-          onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-        ),
       ),
     );
   }
@@ -161,57 +93,37 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
       _isMatriculeValid = false;
       _studentData = null;
       _matriculeController.clear();
-      _usernameController.clear();
-      _passwordController.clear();
-      _confirmPasswordController.clear();
     });
   }
+// Exemple de fonction pour gérer la sélection d'un mode de paiement
+void _selectPaymentMethod(String paymentMethod) async {
+  // 1️⃣ Optionnel : Appel API pour créer la transaction côté serveur
+  // await ApiService.createPayment({
+  //   'eleve_id': studentId,
+  //   'parent_id': parentId,
+  //   'method': paymentMethod,
+  //   'amount': montant,
+  // });
 
-  String? _validateMatricule(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Le matricule est requis';
-    }
-    if (value.trim().length < 3) {
-      return 'Le matricule doit contenir au moins 3 caractères';
-    }
-    return null;
+  // 2️⃣ Redirection vers la page de paiement correspondante
+  if (paymentMethod == 'Mobile Money') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MobileMoneyPaymentScreen()),
+    );
+  } else if (paymentMethod == 'Carte Bancaire') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CardPaymentScreen()),
+    );
+  
+    // Redirection vers le dashboard parent ou confirmation
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const ParentDashboard()),
+    );
   }
-
-  String? _validateUsername(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Le nom d\'utilisateur est requis';
-    }
-    if (value.trim().length < 3) {
-      return 'Le nom d\'utilisateur doit contenir au moins 3 caractères';
-    }
-    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value.trim())) {
-      return 'Seuls les lettres, chiffres et _ sont autorisés';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Le mot de passe est requis';
-    }
-    if (value.length < 8) {
-      return 'Le mot de passe doit contenir au moins 8 caractères';
-    }
-    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
-      return 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre';
-    }
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Veuillez confirmer le mot de passe';
-    }
-    if (value != _passwordController.text) {
-      return 'Les mots de passe ne correspondent pas';
-    }
-    return null;
-  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -232,9 +144,9 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
+            colors: [Colors.green.shade50, Colors.orange.shade50],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.green.shade50, Colors.orange.shade50],
           ),
         ),
         child: SafeArea(
@@ -246,34 +158,23 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // En-tête avec instructions
                     Card(
                       elevation: 2,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           children: [
-                            Icon(
-                              Icons.family_restroom,
-                              size: 48,
-                              color: const Color.fromARGB(255, 56, 125, 142),
-                            ),
+                            Icon(Icons.family_restroom, size: 48, color: const Color.fromARGB(255, 56, 125, 142)),
                             const SizedBox(height: 8),
-                            Text(
-                              'Création de compte parent',
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: const Color.fromARGB(255, 56, 110, 142),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            Text('Souscription parent',
+                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: const Color.fromARGB(255, 56, 110, 142),
+                                  fontWeight: FontWeight.bold,
+                                )),
                             const SizedBox(height: 8),
-                            Text(
-                              'Saisissez le matricule de votre enfant pour commencer',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey.shade600,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
+                            Text('Saisissez le matricule de votre enfant pour commencer',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+                                textAlign: TextAlign.center),
                           ],
                         ),
                       ),
@@ -306,7 +207,6 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                         UpperCaseTextFormatter(),
                         LengthLimitingTextInputFormatter(10),
                       ],
-                      validator: _validateMatricule,
                       onFieldSubmitted: (_) => _verifyMatricule(),
                       onChanged: (_) {
                         if (_isMatriculeValid) {
@@ -319,17 +219,13 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Bouton de vérification
                     ElevatedButton.icon(
                       onPressed: _isVerifyingMatricule ? null : _verifyMatricule,
                       icon: _isVerifyingMatricule
                           ? const SizedBox(
                               width: 16,
                               height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
                           : const Icon(Icons.search),
                       label: Text(_isVerifyingMatricule ? 'Vérification...' : 'Vérifier Matricule'),
@@ -340,11 +236,9 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                       ),
                     ),
 
-                    // Informations de l'élève et formulaire
+                    // Informations de l'élève et modes de paiement
                     if (_isMatriculeValid && _studentData != null) ...[
                       const SizedBox(height: 24),
-                      
-                      // Carte d'informations de l'élève
                       Card(
                         elevation: 3,
                         color: Colors.green.shade50,
@@ -357,13 +251,11 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                                 children: [
                                   Icon(Icons.person, color: const Color.fromARGB(255, 56, 132, 142)),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    'Informations de l\'élève',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color.fromARGB(255, 56, 100, 142),
-                                    ),
-                                  ),
+                                  Text('Informations de l\'élève',
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: const Color.fromARGB(255, 56, 100, 142),
+                                          )),
                                 ],
                               ),
                               const SizedBox(height: 12),
@@ -376,127 +268,26 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Formulaire de création de compte
-                      Text(
-                        'Informations du compte parent',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                      // Modes de paiement
+                     Text('Choisissez un mode de paiement',
+    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+const SizedBox(height: 16),
 
-                      // Nom d'utilisateur
-                      TextFormField(
-                        controller: _usernameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nom d\'utilisateur *',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.person),
-                          helperText: 'Minimum 3 caractères, lettres, chiffres et _ seulement',
-                        ),
-                        validator: _validateUsername,
-                        textInputAction: TextInputAction.next,
-                      ),
-                      const SizedBox(height: 16),
+        ElevatedButton.icon(
+          onPressed: () => _selectPaymentMethod('Mobile Money'),
+          icon: const Icon(Icons.mobile_friendly),
+          label: const Text('Mobile Money'),
+        ),
+        const SizedBox(height: 8),
 
-                      // Mot de passe
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                          labelText: 'Mot de passe *',
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.lock),
-                          suffixIcon: IconButton(
-                            icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                          ),
-                          helperText: 'Au moins 8 caractères avec majuscule, minuscule et chiffre',
-                        ),
-                        obscureText: !_isPasswordVisible,
-                        validator: _validatePassword,
-                        textInputAction: TextInputAction.next,
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Confirmation mot de passe
-                      TextFormField(
-                        controller: _confirmPasswordController,
-                        decoration: InputDecoration(
-                          labelText: 'Confirmer le mot de passe *',
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          suffixIcon: IconButton(
-                            icon: Icon(_isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off),
-                            onPressed: () {
-                              setState(() {
-                                _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                              });
-                            },
-                          ),
-                        ),
-                        obscureText: !_isConfirmPasswordVisible,
-                        validator: _validateConfirmPassword,
-                        textInputAction: TextInputAction.done,
-                        onFieldSubmitted: (_) => _submitSubscription(),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Bouton de soumission
-                      ElevatedButton.icon(
-                        onPressed: _isLoading ? null : _submitSubscription,
-                        icon: _isLoading
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Icon(Icons.account_circle),
-                        label: Text(_isLoading ? 'Souscription en cours...' : 'Souscrire'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: const Color.fromARGB(255, 0, 251, 230),
-                          foregroundColor: Colors.white,
-                          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Note de sécurité
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color.fromARGB(255, 144, 216, 249)),
-                          
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.info, color: const Color.fromARGB(255, 30, 173, 229), size: 20),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Vos informations sont sécurisées et ne seront utilisées que pour la gestion du suivi scolaire.',
-                                style: TextStyle(
-                                  color: const Color.fromARGB(255, 25, 210, 201),
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+        ElevatedButton.icon(
+          onPressed: () => _selectPaymentMethod('Carte Bancaire'),
+          icon: const Icon(Icons.credit_card),
+          label: const Text('Carte Bancaire'),
+        ),
+               const SizedBox(height: 8),
+                              
                     ],
-                    
-                    const SizedBox(height: 32),
                   ],
                 ),
               ),
@@ -513,19 +304,8 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              '$label:',
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(color: Colors.black87),
-            ),
-          ),
+          SizedBox(width: 80, child: Text('$label:', style: const TextStyle(fontWeight: FontWeight.w500))),
+          Expanded(child: Text(value, style: const TextStyle(color: Colors.black87))),
         ],
       ),
     );
@@ -535,13 +315,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
 // Formatter pour convertir automatiquement en majuscules
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    return TextEditingValue(
-      text: newValue.text.toUpperCase(),
-      selection: newValue.selection,
-    );
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:school_flutter/administration/parent/dasboard_basique_parent.dart'; 
+import 'package:school_flutter/administration/parent/dasboard_basique_parent.dart';
+import 'package:school_flutter/administration/parent/infoEleve.dart'; 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -245,31 +246,94 @@ class _parentEspaceLoginState extends State<parentEspaceLogin> {
 /// --------------------
 /// DASHBOARD - PARENT
 /// --------------------
+// parent_dashboard.dart
 class ParentDashboard extends StatefulWidget {
   const ParentDashboard({super.key});
-
   @override
   State<ParentDashboard> createState() => _ParentDashboardState();
 }
 
 class _ParentDashboardState extends State<ParentDashboard> {
   int _selectedIndex = 0;
-
+  String? _matricule;
   final List<String> _titles = [
     "Accueil",
     "Informations de l'élève",
     "Notes",
     "Emploi du temps",
     "Notifications",
+    "Nombre d'élèves souscrits",
   ];
-
   final List<IconData> _icons = [
     Icons.home,
     Icons.info,
     Icons.grade,
     Icons.schedule,
     Icons.notifications,
+    Icons.people,
   ];
+
+  bool _requiresMatricule(int index) {
+    // Assume indices 1 to 4 require matricule (Informations, Notes, Emploi, Notifications)
+    // Adjust as needed for your logic
+    return index >= 1 && index <= 4;
+  }
+
+  Future<String?> _showMatriculeDialog(BuildContext context) async {
+    final TextEditingController controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Entrer le matricule de l\'élève'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(hintText: "Matricule"),
+            autofocus: true,
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Annuler'),
+              onPressed: () {
+                Navigator.of(context).pop(null);
+              },
+            ),
+            TextButton(
+              child: const Text('Confirmer'),
+              onPressed: () {
+                final String matricule = controller.text.trim();
+                if (matricule.isNotEmpty) {
+                  Navigator.of(context).pop(matricule);
+                } else {
+                  // Optionally show error, but for simplicity, pop null
+                  Navigator.of(context).pop(null);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildPage() {
+    switch (_selectedIndex) {
+      case 0:
+        return const ParentDashboard();
+      case 1:
+        return InfoElevePage(matricule: _matricule!);
+     /* case 2:
+        return NotesPage(matricule: _matricule!);
+      case 3:
+        return EmploiDuTempsPage(matricule: _matricule!);
+      case 4:
+        return NotificationsPage(matricule: _matricule!);
+      case 5:
+        return const NombreElevesSouscritsPage();*/
+      default:
+        return const SizedBox.shrink();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -285,16 +349,6 @@ class _ParentDashboardState extends State<ParentDashboard> {
         ),
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: "Déconnexion",
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const ParentLoginScreen()),
-              );
-            },
-          ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: CircleAvatar(
@@ -383,7 +437,17 @@ class _ParentDashboardState extends State<ParentDashboard> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        onTap: () {
+                        onTap: () async {
+                          if (_requiresMatricule(i) && _matricule == null) {
+                            final String? enteredMatricule = await _showMatriculeDialog(context);
+                            if (enteredMatricule == null) {
+                              Navigator.pop(context);
+                              return;
+                            }
+                            setState(() {
+                              _matricule = enteredMatricule;
+                            });
+                          }
                           setState(() {
                             _selectedIndex = i;
                           });
@@ -391,65 +455,43 @@ class _ParentDashboardState extends State<ParentDashboard> {
                         },
                       ),
                     ),
+                  const Divider(
+                    indent: 16,
+                    endIndent: 16,
+                    thickness: 1,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.logout,
+                        color: Colors.grey[600],
+                      ),
+                      title: Text(
+                        "Déconnexion",
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ParentLoginScreen()),
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFF8F9FF),
-              Color(0xFFFFFFFF),
-            ],
-          ),
-        ),
-        child: Center(
-          child: Card(
-            margin: const EdgeInsets.all(20),
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _icons[_selectedIndex],
-                    size: 64,
-                    color: const Color.fromARGB(255, 107, 245, 255),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "Bienvenue dans ${_titles[_selectedIndex]}",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2D3748),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "Cette section sera bientôt disponible",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      body: _buildPage(),
     );
   }
 }
